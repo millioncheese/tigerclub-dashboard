@@ -85,10 +85,22 @@ function migrateSplitGen12(parsed){
   }
   return parsed;
 }
+function migrateSeedGen3(parsed){
+  // 브라우저에 저장된 예전 데이터의 3기가 아직 비어있으면(직접 수정 안 한 상태) 최신 시드의 3기 데이터로 채워줌
+  if(parsed && parsed.cohorts){
+    const gen3 = parsed.cohorts.find(c=>c.id==="gen3");
+    const seedGen3 = SEED.cohorts.find(c=>c.id==="gen3");
+    if(gen3 && seedGen3 && (gen3.creators||[]).length===0 && (gen3.evalMonths||[]).length===0 && seedGen3.creators.length>0){
+      gen3.evalMonths = JSON.parse(JSON.stringify(seedGen3.evalMonths));
+      gen3.creators = JSON.parse(JSON.stringify(seedGen3.creators));
+    }
+  }
+  return parsed;
+}
 function loadState(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw) return migrateSplitGen12(migrateToCohorts(JSON.parse(raw)));
+    if(raw) return migrateSeedGen3(migrateSplitGen12(migrateToCohorts(JSON.parse(raw))));
   }catch(e){}
   const s = JSON.parse(JSON.stringify(SEED));
   s.updatedAt = Date.now();
