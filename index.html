@@ -53,6 +53,195 @@ function escHtml(s){ return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"
 function fmtNum(x){ return Number(x||0).toLocaleString("ko-KR"); }
 function fmtInputNum(x){ return Number(x||0).toLocaleString("ko-KR"); }
 function parseNumInput(s){ return Number(String(s).replace(/[^0-9.-]/g,""))||0; }
+
+/* ---------------- 구글폼 응답 CSV 가져오기 ---------------- */
+let csvImportModalOpen = false;
+let csvImportData = null; // {headers:[...], rows:[{header:value}]}
+let csvImportTargetMonthId = null;
+
+function getCsvMapping(){
+  if(!state.settings.csvImportMapping){
+    state.settings.csvImportMapping = {nameCol:"", handleCol:"", followersCol:"", checklistCols:{}, linkCol:"", metricCols:{}, settlementCols:{}, noteCol:""};
+  }
+  const mp = state.settings.csvImportMapping;
+  if(!mp.checklistCols) mp.checklistCols = {};
+  if(!mp.metricCols) mp.metricCols = {};
+  if(!mp.settlementCols) mp.settlementCols = {};
+  return mp;
+}
+
+function parseCSV(text){
+  if(text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+  for(let i=0; i<text.length; i++){
+    const ch = text[i];
+    if(inQuotes){
+      if(ch === '"'){
+        if(text[i+1] === '"'){ field += '"'; i++; }
+        else inQuotes = false;
+      } else field += ch;
+    } else {
+      if(ch === '"') inQuotes = true;
+      else if(ch === ','){ row.push(field); field = ""; }
+      else if(ch === '\n'){ row.push(field); rows.push(row); row = []; field = ""; }
+      else if(ch === '\r'){ /* skip */ }
+      else field += ch;
+    }
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  const cleanRows = rows.filter(r => !(r.length===1 && r[0].trim()===""));
+  const headers = (cleanRows.shift()||[]).map(h=>h.trim());
+  const dataRows = cleanRows.map(r=>{
+    const obj = {};
+    headers.forEach((h,idx)=> obj[h] = r[idx] !== undefined ? r[idx] : "");
+    return obj;
+  });
+  return {headers, rows: dataRows};
+}
+
+function openCsvImportModal(){
+  csvImportModalOpen = true;
+  csvImportData = null;
+  const cohort = getCurrentCohort();
+  csvImportTargetMonthId = (cohort.evalMonths[0] || {}).id || null;
+  render();
+}
+function closeCsvImportModal(){ csvImportModalOpen = false; csvImportData = null; render(); }
+function handleCsvFileSelect(input){
+  const file = input.files && input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    try{ csvImportData = parseCSV(String(e.target.result)); }
+    catch(err){ alert("CSV 파일을 읽는 중 문제가 발생했습니다."); csvImportData = null; }
+    render();
+  };
+  reader.readAsText(file, "UTF-8");
+}
+function setCsvImportTargetMonth(monthId){ csvImportTargetMonthId = monthId; render(); }
+function setCsvMapping(key, value){ getCsvMapping()[key] = value; saveState(); render(); }
+function setCsvChecklistMapping(itemId, value){ getCsvMapping().checklistCols[itemId] = value; saveState(); render(); }
+function setCsvMetricMapping(fieldId, value){ getCsvMapping().metricCols[fieldId] = value; saveState(); render(); }
+function setCsvSettlementMapping(fieldId, value){ getCsvMapping().settlementCols[fieldId] = value; saveState(); render(); }
+
+function applyCsvImport(){
+  if(!csvImportData){ alert("CSV 파일을 먼저 선택해주세요."); return; }
+  const cohort = getCurrentCohort();
+  const month = cohort.evalMonths.find(m=>m.id===csvImportTargetMonthId);
+  if(!month){ alert("적용할 평가월을 선택해주세요."); return; }
+  const mp = getCsvMapping();
+  if(!mp.nameCol){ alert("이름 컬럼을 매핑해주세요."); return; }
+
+  let matched = 0;
+  const unmatched = [];
+  csvImportData.rows.forEach(row=>{
+    const name = (row[mp.nameCol]||"").trim();
+    const handle = mp.handleCol ? (row[mp.handleCol]||"").trim() : "";
+    if(!name && !handle) return;
+    const c = cohort.creators.find(cr=>{
+      const ch = (cr.handle||"").trim().toLowerCase();
+      const cn = (cr.name||"").trim().toLowerCase();
+      if(handle && ch && ch===handle.toLowerCase()) return true;
+      if(name && cn && cn===name.toLowerCase()) return true;
+      return false;
+    });
+    if(!c){ unmatched.push(name || handle); return; }
+    matched++;
+    const md = ensureMonth(c, month.id);
+
+    if(mp.followersCol && (row[mp.followersCol]||"").toString().trim() !== ""){
+      c.followers[month.id] = Math.max(0, Number(parseNumInput(row[mp.followersCol]))||0);
+    }
+    if(mp.linkCol && (row[mp.linkCol]||"").trim() !== ""){
+      md.link = row[mp.linkCol].trim();
+    }
+    (month.items||[]).forEach(it=>{
+      const col = mp.checklistCols[it.id];
+      if(col && (row[col]||"").toString().trim() !== ""){
+        md.checklist[it.id] = true;
+      }
+    });
+    (state.settings.metricFields||[]).forEach(f=>{
+      const col = mp.metricCols[f.id];
+      if(col && (row[col]||"").toString().trim() !== ""){
+        md.metrics[f.id] = Math.max(0, Number(parseNumInput(row[col]))||0);
+      }
+    });
+    (state.settings.settlementFields||[]).forEach(f=>{
+      const col = mp.settlementCols[f.id];
+      if(col && (row[col]||"").toString().trim() !== ""){
+        md.settlement[f.id] = f.type==="number" ? Math.max(0, Number(parseNumInput(row[col]))||0) : row[col].trim();
+      }
+    });
+    if(mp.noteCol && (row[mp.noteCol]||"").trim() !== ""){
+      md.note = row[mp.noteCol].trim();
+    }
+  });
+
+  saveState();
+  csvImportModalOpen = false;
+  csvImportData = null;
+  render();
+  alert(`${matched}명 반영 완료` + (unmatched.length ? ("\n매칭 실패 " + unmatched.length + "명: " + unmatched.join(", ")) : ""));
+}
+
+function renderCsvImportModal(){
+  if(!csvImportModalOpen) return "";
+  const cohort = getCurrentCohort();
+  const mp = getCsvMapping();
+  const headers = csvImportData ? csvImportData.headers : [];
+  const colOptions = (selected)=> `<option value="">(사용 안 함)</option>` + headers.map(h=>`<option value="${esc(h)}" ${selected===h?"selected":""}>${escHtml(h)}</option>`).join("");
+  const month = cohort.evalMonths.find(m=>m.id===csvImportTargetMonthId);
+
+  return `
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onclick="closeCsvImportModal()">
+      <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[85vh] flex flex-col" onclick="event.stopPropagation()">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+          <h3 class="font-bold text-slate-800">구글폼 응답 CSV 가져오기 <span class="text-xs font-normal text-slate-400">(${escHtml(cohort.label)})</span></h3>
+          <button onclick="closeCsvImportModal()" class="text-slate-400 hover:text-slate-700">✕</button>
+        </div>
+        <div class="p-4 overflow-y-auto space-y-4 flex-1">
+          <div>
+            <label class="block text-xs text-slate-500 mb-1">1. 응답 CSV 파일 선택</label>
+            <input type="file" accept=".csv,text/csv" onchange="handleCsvFileSelect(this)" class="text-sm" />
+            ${csvImportData
+              ? `<p class="text-[11px] text-slate-400 mt-1">${csvImportData.rows.length}개 응답 · 컬럼 ${csvImportData.headers.length}개 인식됨</p>`
+              : `<p class="text-[11px] text-slate-400 mt-1">구글폼 응답 시트를 파일 &gt; 다운로드 &gt; 쉼표로 구분된 값(.csv)으로 저장한 파일을 선택하세요. CSV가 없어도 기존처럼 표에서 직접 수동 입력할 수 있어요.</p>`}
+          </div>
+
+          ${csvImportData ? `
+          <div>
+            <label class="block text-xs text-slate-500 mb-1">2. 적용할 평가월</label>
+            <select onchange="setCsvImportTargetMonth(this.value)" class="border border-slate-300 rounded-lg px-2 py-1.5 text-sm">
+              <option value="">평가월 선택</option>
+              ${cohort.evalMonths.map(m=>`<option value="${m.id}" ${csvImportTargetMonthId===m.id?"selected":""}>${escHtml(m.label)}</option>`).join("")}
+            </select>
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-xs text-slate-500">3. 컬럼 매핑 (한 번 설정하면 다음에도 저장돼요)</label>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <label class="block">이름 (필수)<select onchange="setCsvMapping('nameCol',this.value)" class="w-full border border-slate-200 rounded px-2 py-1 mt-0.5">${colOptions(mp.nameCol)}</select></label>
+              <label class="block">인스타 핸들 (선택, 매칭 정확도↑)<select onchange="setCsvMapping('handleCol',this.value)" class="w-full border border-slate-200 rounded px-2 py-1 mt-0.5">${colOptions(mp.handleCol)}</select></label>
+              <label class="block">팔로워<select onchange="setCsvMapping('followersCol',this.value)" class="w-full border border-slate-200 rounded px-2 py-1 mt-0.5">${colOptions(mp.followersCol)}</select></label>
+              <label class="block">증빙/컨텐츠 링크<select onchange="setCsvMapping('linkCol',this.value)" class="w-full border border-slate-200 rounded px-2 py-1 mt-0.5">${colOptions(mp.linkCol)}</select></label>
+              ${(month ? (month.items||[]) : []).map(it=>`<label class="block">체크: ${escHtml(it.label)}<select onchange="setCsvChecklistMapping('${it.id}',this.value)" class="w-full border border-slate-200 rounded px-2 py-1 mt-0.5">${colOptions(mp.checklistCols[it.id])}</select></label>`).join("")}
+              ${(state.settings.metricFields||[]).map(f=>`<label class="block">${escHtml(f.label)}<select onchange="setCsvMetricMapping('${f.id}',this.value)" class="w-full border border-slate-200 rounded px-2 py-1 mt-0.5">${colOptions(mp.metricCols[f.id])}</select></label>`).join("")}
+              ${(state.settings.settlementFields||[]).map(f=>`<label class="block">${escHtml(f.label)}<select onchange="setCsvSettlementMapping('${f.id}',this.value)" class="w-full border border-slate-200 rounded px-2 py-1 mt-0.5">${colOptions(mp.settlementCols[f.id])}</select></label>`).join("")}
+              <label class="block">비고<select onchange="setCsvMapping('noteCol',this.value)" class="w-full border border-slate-200 rounded px-2 py-1 mt-0.5">${colOptions(mp.noteCol)}</select></label>
+            </div>
+            <p class="text-[11px] text-slate-400">체크 항목은 응답 컬럼에 값이 있으면 완료로 처리돼요. 매핑되지 않았거나 응답이 비어있는 항목은 기존 값이 그대로 유지됩니다.</p>
+          </div>
+          ` : ""}
+        </div>
+        ${csvImportData ? `
+        <div class="p-4 border-t border-slate-100">
+          <button onclick="applyCsvImport()" class="w-full px-3 py-2 rounded-lg text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600">이 평가월에 반영하기</button>
+        </div>` : ""}
+      </div>
+    </div>
+  `;
+}
 function fmtPct(x){ return (x*100).toFixed(2) + "%"; }
 function nl2br(s){ return escHtml(s).replace(/\n/g,"<br/>"); }
 
@@ -143,10 +332,27 @@ function migrateRosterPerCohort(parsed){
 
   return parsed;
 }
+function migrateBackfillEvalMonths(parsed){
+  // 크리에이터는 있는데 평가월(evalMonths)이 비어있는 코호트를 시드 기준으로 복구하고,
+  // 모든 크리에이터가 현재 평가월 데이터 구조를 갖도록 보정
+  if(!parsed || !parsed.cohorts) return parsed;
+  parsed.cohorts.forEach(co=>{
+    const seedCo = SEED.cohorts.find(s=>s.id===co.id);
+    if(seedCo && (co.evalMonths||[]).length===0 && (seedCo.evalMonths||[]).length>0 && (co.creators||[]).length>0){
+      co.evalMonths = JSON.parse(JSON.stringify(seedCo.evalMonths));
+    }
+    (co.creators||[]).forEach(c=>{
+      if(!c.months) c.months = {};
+      if(!c.followers) c.followers = {};
+      (co.evalMonths||[]).forEach(m=> ensureMonth(c, m.id));
+    });
+  });
+  return parsed;
+}
 function loadState(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw) return migrateRosterPerCohort(migrateSeedGen3(migrateSplitGen12(migrateToCohorts(JSON.parse(raw)))));
+    if(raw) return migrateBackfillEvalMonths(migrateRosterPerCohort(migrateSeedGen3(migrateSplitGen12(migrateToCohorts(JSON.parse(raw))))));
   }catch(e){}
   const s = JSON.parse(JSON.stringify(SEED));
   s.updatedAt = Date.now();
@@ -813,6 +1019,7 @@ function renderEvalTab(){
         <h2 class="font-bold text-slate-800">크리에이터 활동사항 (${list.length}/${derived.length}명)</h2>
         <div class="flex gap-2">
           <button onclick="addCreator()" class="px-3 py-1.5 text-sm font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-700">+ 크리에이터 추가</button>
+          <button onclick="openCsvImportModal()" class="px-3 py-1.5 text-sm font-semibold bg-orange-500 text-white rounded-lg hover:bg-orange-600">구글폼 CSV 가져오기</button>
           <button onclick="exportJson()" class="px-3 py-1.5 text-sm font-semibold border border-slate-300 rounded-lg hover:bg-slate-50">Export JSON</button>
           <label class="px-3 py-1.5 text-sm font-semibold border border-slate-300 rounded-lg hover:bg-slate-50 cursor-pointer">
             Import JSON<input type="file" accept="application/json" class="hidden" onchange="importJsonFile(this)" />
@@ -1458,6 +1665,7 @@ function render(){
     </div>
     ${renderEventModal()}
     ${renderRosterImportModal()}
+    ${renderCsvImportModal()}
   `;
   if(editingCell){
     const el = document.getElementById("active-cell-input");
