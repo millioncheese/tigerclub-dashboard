@@ -414,6 +414,24 @@ function commitCell(tableKey, rowId, colId, value){
 }
 
 /* "구분" 컬럼(A/B) 컬러 배지 */
+function findRosterRowForCreator(c){
+  const rows = (state.roster && state.roster.rows) || [];
+  const h = (c.handle||"").trim().toLowerCase();
+  if(h){
+    const byHandle = rows.find(r => (r.cells.handle||"").trim().toLowerCase() === h);
+    if(byHandle) return byHandle;
+  }
+  const n = (c.name||"").trim().toLowerCase();
+  if(n){
+    const byName = rows.find(r => (r.cells.nickname||"").trim().toLowerCase() === n);
+    if(byName) return byName;
+  }
+  return null;
+}
+function creatorTypeFromRoster(c){
+  const row = findRosterRowForCreator(c);
+  return row ? (row.cells.type || "") : "";
+}
 function typeBadgeHtml(val){
   if(val==="A") return `<span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300">A</span>`;
   if(val==="B") return `<span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-sky-100 text-sky-800 border border-sky-300">B</span>`;
@@ -567,10 +585,10 @@ function renderEvalTab(){
     </section>
 
     <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-      ${summaryCard("Graduation", counts.Graduation, "border-purple-400", "text-purple-600", evalFilter.statuses.has("Graduation"))}
-      ${summaryCard("Pass", counts.Pass, "border-green-400", "text-green-600", evalFilter.statuses.has("Pass"))}
-      ${summaryCard("Review", counts.Review, "border-yellow-400", "text-yellow-600", evalFilter.statuses.has("Review"))}
-      ${summaryCard("Adjust", counts.Adjust, "border-orange-400", "text-orange-600", evalFilter.statuses.has("Adjust"))}
+      ${summaryCard("Graduation", counts.Graduation, "border-purple-400", "text-purple-600", evalFilter.statuses.size===0 || evalFilter.statuses.has("Graduation"))}
+      ${summaryCard("Pass", counts.Pass, "border-green-400", "text-green-600", evalFilter.statuses.size===0 || evalFilter.statuses.has("Pass"))}
+      ${summaryCard("Review", counts.Review, "border-yellow-400", "text-yellow-600", evalFilter.statuses.size===0 || evalFilter.statuses.has("Review"))}
+      ${summaryCard("Adjust", counts.Adjust, "border-orange-400", "text-orange-600", evalFilter.statuses.size===0 || evalFilter.statuses.has("Adjust"))}
     </section>
 
     <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-6">
@@ -589,7 +607,7 @@ function renderEvalTab(){
         <div class="flex items-center gap-1.5">
           <span class="text-xs text-slate-500">판정 필터:</span>
           ${["Graduation","Pass","Review","Adjust"].map(st=>`
-            <button onclick="toggleStatusFilter('${st}')" class="chip ${statusChipClass(st)} ${evalFilter.statuses.has(st) ? "ring-2 ring-offset-1 ring-slate-500" : "opacity-40"}">${st}</button>
+            <button onclick="toggleStatusFilter('${st}')" class="chip ${statusChipClass(st)} ${(evalFilter.statuses.size===0 || evalFilter.statuses.has(st)) ? "ring-2 ring-offset-1 ring-slate-500" : "opacity-40"}">${st}</button>
           `).join("")}
         </div>
         <span class="text-xs text-slate-400">정렬: ${sortLabel(evalSort.key)} ${evalSort.dir==="asc"?"오름차순":"내림차순"}</span>
@@ -715,7 +733,7 @@ function metricStatsCardHtml(cohort, list){
   });
   return `
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-      <div class="text-xs font-semibold text-slate-500 mb-3">이 기수(${escHtml(cohort.label)}) 반응지표 합계</div>
+      <div class="text-xs font-semibold text-slate-500 mb-3">${escHtml(cohort.label)} 반응지표 합계</div>
       <div class="grid grid-cols-3 gap-3">
         ${sums.length ? sums.map(f=>{
           const max = Math.max(1, ...f.byMonth.map(m=>m.value), 0);
@@ -731,7 +749,7 @@ function metricStatsCardHtml(cohort, list){
             <div class="text-2xl mb-1">${metricEmoji(f.id)}</div>
             <div class="stat-count text-lg font-extrabold text-slate-800 tabular-nums" data-target="${f.sum}">0</div>
             <div class="text-[11px] text-slate-400 mt-0.5 truncate">${escHtml(f.label)}</div>
-            ${f.byMonth.length ? `<div class="flex items-end gap-1 mt-2 justify-center">${bars}</div>` : ""}
+            ${(f.byMonth.length && f.id!=="views") ? `<div class="flex items-end gap-1 mt-2 justify-center">${bars}</div>` : ""}
           </div>`;
         }).join("") : `<div class="col-span-3 text-xs text-slate-300 text-center py-2">반응지표가 없습니다</div>`}
       </div>
@@ -760,7 +778,7 @@ function animateStatNumbers(){
 function evalRowHtml(c, isExpanded, cohort){
   return `
     <tr class="border-b border-slate-50 hover:bg-slate-50/60 align-top">
-      <td class="px-3 py-2 font-semibold text-slate-800"><div class="flex items-center gap-1.5">${typeBadgeHtml(c.type)}<span>${escHtml(c.name)}</span></div></td>
+      <td class="px-3 py-2 font-semibold text-slate-800"><div class="flex items-center gap-1.5">${typeBadgeHtml(creatorTypeFromRoster(c))}<span>${escHtml(c.name)}</span></div></td>
       <td class="px-3 py-2">${fmtNum(c.followers)}</td>
       ${cohort.evalMonths.map(m=>`<td class="px-3 py-2">${monthDotsHtml(c,m)}</td>`).join("")}
       <td class="px-3 py-2 tabular-nums">${fmtPct(c.rate)}</td>
@@ -780,13 +798,11 @@ function evalDetailHtml(c, cohort){
       <td colspan="${5+cohort.evalMonths.length}" class="px-4 py-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
           <label class="block">
-            <span class="text-xs text-slate-500">구분</span>
-            <select onchange="updateCreatorField('${c.id}','type',this.value)" class="w-full border border-slate-300 rounded-lg px-2 py-1.5 mt-0.5">
-              <option value="" ${!c.type?"selected":""}>-</option>
-              <option value="A" ${c.type==="A"?"selected":""}>A</option>
-              <option value="B" ${c.type==="B"?"selected":""}>B</option>
-              <option value="P" ${c.type==="P"?"selected":""}>P</option>
-            </select>
+            <span class="text-xs text-slate-500">구분 (명단 기준)</span>
+            <div class="flex items-center gap-2 mt-1.5">
+              ${typeBadgeHtml(creatorTypeFromRoster(c))}
+              <button onclick="setTab('roster')" class="text-[11px] text-orange-600 hover:underline">명단에서 수정</button>
+            </div>
           </label>
           <label class="block">
             <span class="text-xs text-slate-500">이름</span>
@@ -833,7 +849,7 @@ function monthEditorHtml(c, m){
         ${(m.items||[]).map(it=>`
           <label class="flex items-center gap-1.5 text-xs text-slate-600">
             <input type="checkbox" ${md.checklist && md.checklist[it.id] ? "checked":""} onchange="updateChecklist('${c.id}','${m.id}','${it.id}', this.checked)" class="w-4 h-4" />
-            ${escHtml(displayItemLabel(c.type, it.label))}
+            ${escHtml(displayItemLabel(creatorTypeFromRoster(c), it.label))}
           </label>`).join("") || `<span class="text-[11px] text-slate-400">체크 항목 없음 (설정 탭에서 추가)</span>`}
       </div>
       <label class="block">
