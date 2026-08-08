@@ -414,6 +414,8 @@ function commitCell(tableKey, rowId, colId, value){
 }
 
 /* "구분" 컬럼(A/B) 컬러 배지 */
+// 활동사항 크리에이터 이름과 명단 닉네임 표기가 다른 경우를 위한 별칭 매핑
+const CREATOR_NAME_ALIASES = { "꿀돈이": "꿀돈", "샐러리부부": "금융권부부" };
 function findRosterRowForCreator(c){
   const rows = (state.roster && state.roster.rows) || [];
   const h = (c.handle||"").trim().toLowerCase();
@@ -425,6 +427,11 @@ function findRosterRowForCreator(c){
   if(n){
     const byName = rows.find(r => (r.cells.nickname||"").trim().toLowerCase() === n);
     if(byName) return byName;
+  }
+  const alias = CREATOR_NAME_ALIASES[(c.name||"").trim()];
+  if(alias){
+    const byAlias = rows.find(r => (r.cells.nickname||"").trim() === alias);
+    if(byAlias) return byAlias;
   }
   return null;
 }
