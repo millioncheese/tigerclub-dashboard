@@ -31,19 +31,19 @@
 </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800">
-<div id="app" class="max-w-[1600px] mx-auto p-4 md:p-8"></div>
+<div id="app" class="min-h-screen"></div>
 
 <script>
 /* =========================================================
    호랑이클럽 운영진 대시보드 (v2 - 실데이터 반영)
-   탭: 활동평가(자동채점) / 크리에이터 명단 / 타임라인 / 설정
+   탭: 활동사항(자동채점) / 크리에이터 명단 / 타임라인 / 설정
    - 명단·타임라인 탭은 컬럼(항목) 자유 추가/삭제/수정 가능한 범용 표
-   - 활동평가 탭은 채점에 쓰이는 월별 체크항목·반응지표·정산항목을
+   - 활동사항 탭은 채점에 쓰이는 월별 체크항목·반응지표·정산항목을
      "설정" 탭에서 추가/삭제/수정 가능
    - 데이터는 이 브라우저(localStorage)에 저장됩니다.
    ========================================================= */
 
-const SEED = {"settings": {"graduationFollowers": 60000, "passMin": 8, "reviewMin": 6, "evalMonths": [{"id": "m6", "label": "6월", "items": [{"id": "notice", "label": "공지사항 확인"}, {"id": "highlight", "label": "하이라이트"}, {"id": "content", "label": "자율컨텐츠"}]}, {"id": "m7", "label": "7월", "items": [{"id": "highlight", "label": "하이라이트"}, {"id": "content", "label": "자율컨텐츠"}]}, {"id": "m8", "label": "8월", "items": [{"id": "highlight", "label": "하이라이트"}, {"id": "content", "label": "자율컨텐츠"}]}], "metricFields": [{"id": "views", "label": "조회수"}, {"id": "saves", "label": "저장"}, {"id": "shares", "label": "공유"}], "settlementFields": [{"id": "amount", "label": "비용지급", "type": "number"}, {"id": "method", "label": "지급방법", "type": "select", "options": ["개인", "세금계산서"]}, {"id": "note", "label": "정산비고", "type": "text"}]}, "roster": {"columns": [{"id": "num", "label": "번호", "type": "text"}, {"id": "type", "label": "구분", "type": "text"}, {"id": "nickname", "label": "닉네임", "type": "text"}, {"id": "handle", "label": "인스타 핸들", "type": "text"}, {"id": "note", "label": "비고", "type": "textarea"}], "rows": [{"id": "r_ppf58a", "cells": {"num": "1", "type": "A", "nickname": "쭈미", "handle": "jjumi_s2", "note": ""}}, {"id": "r_rzodyy", "cells": {"num": "2", "type": "A", "nickname": "찡이", "handle": "jjingee__", "note": ""}}, {"id": "r_wi5fnd", "cells": {"num": "3", "type": "A", "nickname": "덩굴이", "handle": "pumpvine_toon", "note": ""}}, {"id": "r_dnsexy", "cells": {"num": "4", "type": "A", "nickname": "알파카", "handle": "alpaca_is_free", "note": ""}}, {"id": "r_21eoqo", "cells": {"num": "5", "type": "A", "nickname": "쑤디", "handle": "suedie_log", "note": ""}}, {"id": "r_z8xdh3", "cells": {"num": "6", "type": "A", "nickname": "포슬", "handle": "four_seul", "note": ""}}, {"id": "r_gz6n0m", "cells": {"num": "7", "type": "A", "nickname": "똑경이", "handle": "ddock_economy", "note": ""}}, {"id": "r_3g8y8p", "cells": {"num": "8", "type": "A", "nickname": "눙글", "handle": "nuungle", "note": ""}}, {"id": "r_q33gzu", "cells": {"num": "9", "type": "A", "nickname": "밀리언치즈", "handle": "million_cheese", "note": ""}}, {"id": "r_y0669i", "cells": {"num": "10", "type": "A", "nickname": "꿀돈", "handle": "gguldon_", "note": ""}}, {"id": "r_aqeq6z", "cells": {"num": "11", "type": "A", "nickname": "김먀옹", "handle": "Kim.myao", "note": ""}}, {"id": "r_ki4md6", "cells": {"num": "12", "type": "A", "nickname": "부자람지", "handle": "buja.ramji", "note": ""}}, {"id": "r_e0o023", "cells": {"num": "13", "type": "A", "nickname": "리자매", "handle": "lii_sistar_", "note": ""}}, {"id": "r_7wyg8c", "cells": {"num": "14", "type": "A", "nickname": "금융권부부", "handle": "salary_bubu", "note": ""}}, {"id": "r_vdmkak", "cells": {"num": "15", "type": "A", "nickname": "별탱", "handle": "taengstar_", "note": ""}}, {"id": "r_o3xzan", "cells": {"num": "16", "type": "A", "nickname": "머니모니", "handle": "money__moni__", "note": ""}}, {"id": "r_m50qo7", "cells": {"num": "17", "type": "A", "nickname": "낭콩", "handle": "nangkong.bean", "note": ""}}, {"id": "r_ysztq6", "cells": {"num": "18", "type": "A", "nickname": "꿀비", "handle": "ggulbees/", "note": ""}}, {"id": "r_gxfdtn", "cells": {"num": "19", "type": "B", "nickname": "세빵이", "handle": "sebbang_2", "note": ""}}]}, "timeline": {"columns": [{"id": "content", "label": "내용", "type": "text"}, {"id": "todo", "label": "할 일", "type": "text"}, {"id": "status", "label": "상태", "type": "select", "options": ["완료", "진행중", "예정", "사후관리"]}, {"id": "owner", "label": "담당자", "type": "text"}, {"id": "memo", "label": "메모", "type": "textarea"}], "rows": [{"id": "t_1vtx2u", "date": "2026-02-05", "cells": {"content": "[호랑이클럽] 1차기획안", "todo": "1차 기획안 -> 단톡방", "status": "완료", "owner": "밀리언치즈", "memo": "https://docs.google.com/document/d/1ba_NrfJ_VC3IoT28LOBypPa4xFDPPfxqmvItiDPifCY/edit?usp=sharing"}}, {"id": "t_rw1gqz", "date": "2026-02-09", "cells": {"content": "인플루언서 3명 웹세미나 참여check", "todo": "참석자 list-up -> 김봉연기자님", "status": "완료", "owner": "밀리언치즈", "memo": "10명"}}, {"id": "t_n029ls", "date": "2026-02-10", "cells": {"content": "상반기 기획안 검토 및 논의", "todo": "", "status": "완료", "owner": "전유선대표님", "memo": ""}}, {"id": "t_twqwfv", "date": "2026-02-11", "cells": {"content": "웹세미나", "todo": "리마인드 연락(17:30,치즈)", "status": "완료", "owner": "", "memo": "1. 행사 이메일 회신완료 2. 세미나 후기 회신 완료"}}, {"id": "t_62qjns", "date": "2026-02-13", "cells": {"content": "인플루언서 50명 중 1,2차 참석의사 확인", "todo": "1. 인스타계정 확보 2. DM발송", "status": "완료", "owner": "해완님(완료), 치즈(진행 중)", "memo": ""}}, {"id": "t_ba8vy2", "date": "2026-02-22", "cells": {"content": "예산기획", "todo": "", "status": "완료", "owner": "밀리언치즈", "memo": ""}}, {"id": "t_3aurgg", "date": "2026-02-23", "cells": {"content": "내부 제안할 호랑이클럽 멤버 확정", "todo": "", "status": "완료", "owner": "앤써컴퍼니", "memo": ""}}, {"id": "t_bwr3me", "date": "2026-02-24", "cells": {"content": "TIGER<->앤써컴퍼니 미팅(오후)", "todo": "", "status": "완료", "owner": "", "memo": ""}}, {"id": "t_qq68vy", "date": "2026-02-25", "cells": {"content": "", "todo": "", "status": "완료", "owner": "", "memo": ""}}, {"id": "t_nswvq2", "date": "2026-02-26", "cells": {"content": "공식제안서 제작 및 전달 및 확정", "todo": "제안서 제작(완료)", "status": "", "owner": "앤써컴퍼니, 밀리언치즈", "memo": ""}}, {"id": "t_mk7fyr", "date": "2026-02-27", "cells": {"content": "", "todo": "이메일 송부(완료)", "status": "", "owner": "", "memo": ""}}, {"id": "t_10x9x2", "date": "2026-02-28", "cells": {"content": "", "todo": "15명 최종명단 확정", "status": "", "owner": "", "memo": ""}}, {"id": "t_r3ycfy", "date": "2026-03-04", "cells": {"content": "간담회 오후 4시", "todo": "장소확정/장소 재 안내 연락", "status": "", "owner": "", "memo": "간담회 공지사항 리체크 필요/ 인플루언서별 이름표배치 등"}}, {"id": "t_aw0s4j", "date": "2026-03-06", "cells": {"content": "[공지방] [교육방] 개설", "todo": "", "status": "완료", "owner": "밀리언치즈", "memo": ""}}, {"id": "t_hd4emg", "date": "2026-03-09", "cells": {"content": "[교육방] ETF 적립식 투자 교육 시작", "todo": "", "status": "완료", "owner": "보라개미", "memo": ""}}, {"id": "t_9g3lfd", "date": "2026-03-11", "cells": {"content": "3월 가이드라인 배포", "todo": "", "status": "완료", "owner": "", "memo": ""}}, {"id": "t_uuuqtw", "date": "2026-03-13", "cells": {"content": "[크리에이터] 정산관련서류& 활동보드 안내", "todo": "제출 링크 이메일발송", "status": "완료", "owner": "밀리언치즈", "memo": ""}}, {"id": "t_3yyw82", "date": "2026-03-18", "cells": {"content": "인플루언서 웹세미나 18:30", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_7nxb06", "date": "2026-03-01", "cells": {"content": "앤써컴퍼니x밀리언치즈x보라개미 오프라인미팅", "todo": "", "status": "", "owner": "", "memo": "계약서여부/ 2기 활동방향 / 보라개미 교육방향성 / 신규멤버 영입방향"}}, {"id": "t_ws9eai", "date": "2026-04-01", "cells": {"content": "인플루언서 웹세미나 18:30", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_tc5jmu", "date": "2026-04-10", "cells": {"content": "3월 협업 건 지급 완료", "todo": "", "status": "완료", "owner": "", "memo": "별탱, 리자매 확인"}}, {"id": "t_apy33o", "date": "2026-04-15", "cells": {"content": "인플루언서 웹세미나 18:30", "todo": "", "status": "완료", "owner": "", "memo": ""}}, {"id": "t_q1bnrl", "date": "2026-04-16", "cells": {"content": "미래에셋 내부 미팅", "todo": "2기 가이드라인 변경 필요", "status": "완료", "owner": "", "memo": "1. 이벤트 포함 컨텐츠 - 보관처리\n2. 이벤트 하이라이트 심의필 확정"}}, {"id": "t_82e1rg", "date": "2026-04-17", "cells": {"content": "1. 이벤트 포함 컨텐츠 - 보관처리", "todo": "보관 혹은 수정처리 안내 완료", "status": "완료", "owner": "", "memo": ""}}, {"id": "t_3bi719", "date": "2026-04-27", "cells": {"content": "", "todo": "", "status": "", "owner": "", "memo": "4월 말 이벤트링크 + 업로드 완료 -> 5월 10일 \n5월 이벤트-> 개별 이메일 예정(하이라이트 이어 붙여도 상관없음)\n5월 자율 컨텐츠 -> 교육받은내용(자율컨텐츠) + 뉴스레터, 웨비나, 상장자료 이메일 예정(자율컨텐츠 안내 필요. 권장사항 + 기획안 컨펌과정 없다. 언급자체도 감사 + 우선언급 매우 감사."}}, {"id": "t_oshzl8", "date": "2026-05-08", "cells": {"content": "머니쇼", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_p67idq", "date": "2026-05-09", "cells": {"content": "머니쇼", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_pmvza4", "date": "2026-05-10", "cells": {"content": "머니쇼", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_dhwgnm", "date": "2026-05-11", "cells": {"content": "저녁 미팅 [2기관련]", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_7v6m17", "date": "2026-05-13", "cells": {"content": "웹세미나", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_06131r", "date": "2026-05-15", "cells": {"content": "", "todo": "", "status": "", "owner": "", "memo": "1. 9월 금감원 감사가 있음(그 전까진 규모 유지)\n2. 2기는 1기 수준을 유지\n3. 블로그처럼 바로 눈에 띄도록 가시적인 보고를 제공드릴예정(보완점 찾아보기)\n미래에셋자산운용측이 업데이트사항을 매번 볼 수 잇는 방향을 선호하긴 함. \n\n4. 1기 설문조사 + 연장희망 수요조사 진행 -> 2기 희망자는 최대한 가져가는 중\n5. 내부심사 기준을 세우기(협업 효과레벨)\n6. 최대 800만원 기준으로 리스트업리뉴얼\n7. 5월 하이라이트 업데이트 확인 할 것.\n8. 지금 집중할 부분: 단일종목레버리지(TIGER 운용보수가 가장 적다는 부분, KODEX 레버리지 비율이 9할인 상황)\n분위기 조성이 필요함."}}, {"id": "t_1gbw97", "date": "2026-05-18", "cells": {"content": "1기 설문조사 제작", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_y5nnlp", "date": "2026-05-19", "cells": {"content": "1기 설문조사", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_aocpk4", "date": "2026-05-20", "cells": {"content": "1기 설문조사", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_7wmapz", "date": "2026-05-21", "cells": {"content": "1기 설문조사", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_uah2ml", "date": "2026-05-22", "cells": {"content": "TIGER 팬페스타", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_tkcst2", "date": "2026-05-24", "cells": {"content": "호랑이클럽 2기 모집 안내문 발송", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_ajlvux", "date": "2026-05-25", "cells": {"content": "2기 준비 미팅", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_wreed4", "date": "2026-05-27", "cells": {"content": "2기 모집", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_xidvcs", "date": "2026-05-28", "cells": {"content": "미래에셋증권운용사 미팅, 2기 명단 확정", "todo": "", "status": "", "owner": "", "memo": "-> 이벤트로 고정하는것(official) / \n<- TIGER ETF를 어느정도 노출시켜도 되는건지 / 하면 좋은건지?\n\n->2기 방향성\n상품노출되지 않는 이벤트(1일~10일 업로드, 캡쳐본으로 기록 괜찮음)\n신규상품이 (상품명)(신규상장날) 노출되면 가장 BEST\n\n-> 2기 확정 / 협업액 통일(850내) / 웹세미나만 들어올 생각있는지\n-> [뉴스레터] 해당 상품을 참고하여 자율 콘텐츠 진행. 6/2\n-> (함께성장용) 웹세비나, 보라개미 시황, 시장 업데이트\n-> 2기 단톡방 새로 생성/ 컨텐츠는 단톡방에 업로드하며/ 진행상황 매주 업데이트\n-> 치즈가 컨텐츠 중요도를 개별 DM으로 언급할것"}}, {"id": "t_2dmbu2", "date": "2026-05-29", "cells": {"content": "꿀비님 A타입 추가", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_acmwb2", "date": "2026-05-30", "cells": {"content": "2기 단톡방 초대", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_8a08wq", "date": "2026-06-16", "cells": {"content": "웹세미나", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_pmu0dw", "date": "2026-06-23", "cells": {"content": "TIGER ETF 20주년 마라톤대회", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_mpbrhf", "date": "2026-07-06", "cells": {"content": "7월 하이라이트 이벤트 게시일정", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_1a2aed", "date": "2026-07-27", "cells": {"content": "7월 주식&컨텐츠 디깅(오프라인)", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_0jzhi1", "date": "2026-07-29", "cells": {"content": "웹세미나, TDF2045", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_7vgl1z", "date": "2026-08-03", "cells": {"content": "8월 호랑이클럽 활동 이메일 안내", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_6c5bzw", "date": "2026-08-12", "cells": {"content": "대표님 미팅", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_rf4wx5", "date": "2026-08-20", "cells": {"content": "심의필 멤버들 협업비용 논의시점", "todo": "", "status": "", "owner": "", "memo": ""}}]}, "creators": [{"id": "c_pmhl4c", "name": "쭈미", "handle": "jjumi_s2", "followers": {"m6": 8000, "m7": 18000, "m8": 18000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DZH1SGLAf7R/?igsh=MXc1ZHJ2ODZja2hpNQ==", "metrics": {"views": 31000, "saves": 504, "shares": 198}, "settlement": {"amount": 250000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbVoOWeiSgU/?igsh=MW9hcHR2ZXJpNWgwMQ==", "metrics": {"views": 19118, "saves": 34, "shares": 21}, "settlement": {"amount": 250000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": false, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_cyhi0z", "name": "머니모니", "handle": "money__moni__", "followers": {"m6": 9000, "m7": 11000, "m8": 11000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DZuK897CFmK/?img_index=1\nhttps://moneymoni.stibee.com/p/24", "metrics": {"views": 14388, "saves": 177, "shares": 23}, "settlement": {"amount": 250000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbAidjYiWUU/?igsh=ZWg2anZ0bjV0N25v", "metrics": {"views": 6257, "saves": 59, "shares": 12}, "settlement": {"amount": 250000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": true, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_wxzjat", "name": "샐러리부부", "handle": "", "followers": {"m6": 10000, "m7": 10000, "m8": 10000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DZmTSKYEjxD/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", "metrics": {"views": 5344, "saves": 38, "shares": 7}, "settlement": {"amount": 350000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbJ520Oknpf/?igsh=d3NpcTVqZXkxdGJ2", "metrics": {"views": 11559, "saves": 117, "shares": 28}, "settlement": {"amount": 350000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": true, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_ertozb", "name": "낭콩", "handle": "nangkong.bean", "followers": {"m6": 13000, "m7": 18000, "m8": 18000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DZ9cnDjExjG/?img_index=2&igsh=ZmlpZHg1d2I2bmg5", "metrics": {"views": 112431, "saves": 2500, "shares": 678}, "settlement": {"amount": 250000, "method": "세금계산서", "note": "7/1 세금계산서 요청완료"}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbJlJU-k_Wk/?igsh=cHMzaWV5M2d1MHll", "metrics": {"views": 27400, "saves": 167, "shares": 18}, "settlement": {"amount": 250000, "method": "세금계산서", "note": "세금계산서 발행 요청 중"}}, "m8": {"checklist": {"highlight": true, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_satnzk", "name": "찡이", "handle": "jjingee__", "followers": {"m6": 19000, "m7": 20000, "m8": 20000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DZ4oEHAFGw8/?igsh=YTE2MThzZGkwajNl", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 750000, "method": "세금계산서", "note": "5월 400,000원\n6월 350,000원 합비용\n7/1 세금계산서 요청완료"}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DakmqO4lCn2/?igsh=MW9hM2F5M2JtZmV5Yg==", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 350000, "method": "세금계산서", "note": "세금계산서 발행완료"}}, "m8": {"checklist": {"highlight": false, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_ljk7jo", "name": "포슬", "handle": "four_seul", "followers": {"m6": 20000, "m7": 21000, "m8": 21000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DZxZL8TnyrC/?igsh=MXM5cDU0M2l5bWlhdw==", "metrics": {"views": 7020, "saves": 75, "shares": 15}, "settlement": {"amount": 450000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/Dbb3yAKE092/?img_index=1&igsh=MWJndHRpY2F3dnNudg==", "metrics": {"views": 29112, "saves": 613, "shares": 93}, "settlement": {"amount": 450000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": false, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_vzqw5j", "name": "밀리언치즈", "handle": "million_cheese", "followers": {"m6": 22000, "m7": 22000, "m8": 25000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DZ4y5gHHXZ3/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", "metrics": {"views": 67447, "saves": 2700, "shares": 802}, "settlement": {"amount": 450000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbUR5RIk4aX/?igsh=bHg5anBpMmVxOWlr", "metrics": {"views": 15000, "saves": 186, "shares": 20}, "settlement": {"amount": 450000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": true, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_t3fim0", "name": "김먀옹", "handle": "Kim.myao", "followers": {"m6": 23000, "m7": 23000, "m8": 23000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DaDPBR_mjrz/?igsh=MWV2ampwNnBoczR2dw==", "metrics": {"views": 12600, "saves": 165, "shares": 36}, "settlement": {"amount": 450000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbalfakmscK/?img_index=9&igsh=emFyMGFlanlidGE4", "metrics": {"views": 83000, "saves": 1800, "shares": 800}, "settlement": {"amount": 450000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": true, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_hbb3wn", "name": "별탱", "handle": "taengstar_", "followers": {"m6": 27000, "m7": 28000, "m8": 27000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DaB7FX9H9lU/?igsh=MWd6NDgwZmg4MnBhaQ==", "metrics": {"views": 22283, "saves": 141, "shares": 28}, "settlement": {"amount": 450000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbLGJi5FN1b/?igsh=czBjMXlrNTcycjl4", "metrics": {"views": 11469, "saves": 28, "shares": 7}, "settlement": {"amount": 450000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": false, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_73ewfq", "name": "똑경이", "handle": "ddock_economy", "followers": {"m6": 28000, "m7": 35000, "m8": 36000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DZH8rVDCQ5E/?img_index=1", "metrics": {"views": 224014, "saves": 4888, "shares": 3464}, "settlement": {"amount": 450000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/reel/DbFyFa7NvB6/?igsh=MTR4MGdzY3M2MjRmbg==", "metrics": {"views": 80864, "saves": 2000, "shares": 614}, "settlement": {"amount": 450000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": false, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_tl5ix1", "name": "덩굴이", "handle": "pumpvine_toon", "followers": {"m6": 30000, "m7": 31000, "m8": 31000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DaAVWmOgR2y/?igsh=bHRmNmltdmZsempp", "metrics": {"views": 31483, "saves": 424, "shares": 74}, "settlement": {"amount": 550000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DaZ-hkpgZ9p/?img_index=4&igsh=MWp5a3c5d3RvMDFucg==", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 550000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": true, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_aw1wxx", "name": "눙글", "handle": "nuungle", "followers": {"m6": 37000, "m7": 39000, "m8": 39000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/reel/DaA0RPHhDeG/?igsh=Y2ljcWJhMXZsZzY3", "metrics": {"views": 19215, "saves": 398, "shares": 152}, "settlement": {"amount": 550000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/reel/DbVezgFBfMa/?igsh=MTZuNGdrNzFiamppNw==", "metrics": {"views": 15334, "saves": 181, "shares": 82}, "settlement": {"amount": 550000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": true, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_ana4ak", "name": "부자람지", "handle": "buja.ramji", "followers": {"m6": 41000, "m7": 43000, "m8": 44000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/reel/DZHchkauleI/?igsh=MTlwa2psNW9tYTZ1OA==", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 650000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbU2M1NH3yC/?igsh=MXBpdXcwcXh4dGcwbg==", "metrics": {"views": 74275, "saves": 2900, "shares": 1500}, "settlement": {"amount": 650000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": true, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_6z5g5h", "name": "알파카", "handle": "alpaca_is_free", "followers": {"m6": 42000, "m7": 41000, "m8": 41000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DaCvp5qmr-u/?igsh=MTZoeWhvZzdqbmxicw==", "metrics": {"views": 21890, "saves": 35, "shares": 15}, "settlement": {"amount": 650000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbVq3x8Gjrj/?igsh=NHZueHFxYmI4d2pn", "metrics": {"views": 17064, "saves": 91, "shares": 8}, "settlement": {"amount": 650000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": false, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_un1hdl", "name": "꿀돈이", "handle": "", "followers": {"m6": 44000, "m7": 49000, "m8": 49000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DZBTorPk40-/?img_index=5&igsh=MXhmajNzdW1ybHJibg==", "metrics": {"views": 287000, "saves": 3400, "shares": 3420}, "settlement": {"amount": 650000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbWvP6ukwA6/?igsh=MTIwMGJnYTRzNGxhbw==", "metrics": {"views": 25890, "saves": 296, "shares": 55}, "settlement": {"amount": 650000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": false, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_9gbk39", "name": "리자매", "handle": "lii_sistar_", "followers": {"m6": 45000, "m7": 48000, "m8": 48000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DaFpDo5ki5V/?igsh=ZnNhczh6bThueHI=", "metrics": {"views": 22858, "saves": 217, "shares": 47}, "settlement": {"amount": 650000, "method": "세금계산서", "note": "6/30 세금계산서 발행"}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/reel/DbYEDLuy-fv/?igsh=cjVic2g1Nm9saGZ3", "metrics": {"views": 9627, "saves": 31, "shares": 10}, "settlement": {"amount": 650000, "method": "세금계산서", "note": "세금계산서 발행 요청 중"}}, "m8": {"checklist": {"highlight": false, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_h16vb9", "name": "쑤디", "handle": "suedie_log", "followers": {"m6": 58000, "m7": 66000, "m8": 67000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DZr2bdOE6wy/?igsh=Nnh1eHB0djIydzN5", "metrics": {"views": 92335, "saves": 2477, "shares": 557}, "settlement": {"amount": 750000, "method": "세금계산서", "note": "7/1 세금계산서 요청완료"}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbIkZOME3pH/?igsh=a3BqdW9pczFvcmR4", "metrics": {"views": 53473, "saves": 1589, "shares": 343}, "settlement": {"amount": 750000, "method": "세금계산서", "note": "세금계산서 발행완료"}}, "m8": {"checklist": {"highlight": true, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_0r5b46", "name": "꿀비", "handle": "ggulbees/", "followers": {"m6": 108000, "m7": 113000, "m8": 113000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/reel/DZtpfhCSgN9/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", "metrics": {"views": 1680000, "saves": 5945, "shares": 1474}, "settlement": {"amount": 800000, "method": "세금계산서", "note": "7/1 세금계산서 요청완료"}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbAJijDkoj9/", "metrics": {"views": 100000, "saves": 2600, "shares": 1000}, "settlement": {"amount": 800000, "method": "세금계산서", "note": "세금계산서 발행 요청 중"}}, "m8": {"checklist": {"highlight": true, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}]};
+const SEED = {"settings": {"graduationFollowers": 60000, "passMin": 8, "reviewMin": 6, "metricFields": [{"id": "views", "label": "조회수"}, {"id": "saves", "label": "저장"}, {"id": "shares", "label": "공유"}], "settlementFields": [{"id": "amount", "label": "협업비용", "type": "number"}, {"id": "method", "label": "지급방법", "type": "select", "options": ["개인", "세금계산서"]}, {"id": "note", "label": "정산비고", "type": "text"}]}, "roster": {"columns": [{"id": "num", "label": "번호", "type": "text"}, {"id": "type", "label": "구분", "type": "text"}, {"id": "nickname", "label": "닉네임", "type": "text"}, {"id": "handle", "label": "인스타 핸들", "type": "text"}, {"id": "note", "label": "비고", "type": "textarea"}], "rows": [{"id": "r_ppf58a", "cells": {"num": "1", "type": "A", "nickname": "쭈미", "handle": "jjumi_s2", "note": ""}}, {"id": "r_rzodyy", "cells": {"num": "2", "type": "A", "nickname": "찡이", "handle": "jjingee__", "note": ""}}, {"id": "r_wi5fnd", "cells": {"num": "3", "type": "A", "nickname": "덩굴이", "handle": "pumpvine_toon", "note": ""}}, {"id": "r_dnsexy", "cells": {"num": "4", "type": "A", "nickname": "알파카", "handle": "alpaca_is_free", "note": ""}}, {"id": "r_21eoqo", "cells": {"num": "5", "type": "A", "nickname": "쑤디", "handle": "suedie_log", "note": ""}}, {"id": "r_z8xdh3", "cells": {"num": "6", "type": "A", "nickname": "포슬", "handle": "four_seul", "note": ""}}, {"id": "r_gz6n0m", "cells": {"num": "7", "type": "A", "nickname": "똑경이", "handle": "ddock_economy", "note": ""}}, {"id": "r_3g8y8p", "cells": {"num": "8", "type": "A", "nickname": "눙글", "handle": "nuungle", "note": ""}}, {"id": "r_q33gzu", "cells": {"num": "9", "type": "A", "nickname": "밀리언치즈", "handle": "million_cheese", "note": ""}}, {"id": "r_y0669i", "cells": {"num": "10", "type": "A", "nickname": "꿀돈", "handle": "gguldon_", "note": ""}}, {"id": "r_aqeq6z", "cells": {"num": "11", "type": "A", "nickname": "김먀옹", "handle": "Kim.myao", "note": ""}}, {"id": "r_ki4md6", "cells": {"num": "12", "type": "A", "nickname": "부자람지", "handle": "buja.ramji", "note": ""}}, {"id": "r_e0o023", "cells": {"num": "13", "type": "A", "nickname": "리자매", "handle": "lii_sistar_", "note": ""}}, {"id": "r_7wyg8c", "cells": {"num": "14", "type": "A", "nickname": "금융권부부", "handle": "salary_bubu", "note": ""}}, {"id": "r_vdmkak", "cells": {"num": "15", "type": "A", "nickname": "별탱", "handle": "taengstar_", "note": ""}}, {"id": "r_o3xzan", "cells": {"num": "16", "type": "A", "nickname": "머니모니", "handle": "money__moni__", "note": ""}}, {"id": "r_m50qo7", "cells": {"num": "17", "type": "A", "nickname": "낭콩", "handle": "nangkong.bean", "note": ""}}, {"id": "r_ysztq6", "cells": {"num": "18", "type": "A", "nickname": "꿀비", "handle": "ggulbees/", "note": ""}}, {"id": "r_gxfdtn", "cells": {"num": "19", "type": "B", "nickname": "세빵이", "handle": "sebbang_2", "note": ""}}]}, "timeline": {"columns": [{"id": "content", "label": "내용", "type": "text"}, {"id": "todo", "label": "할 일", "type": "text"}, {"id": "status", "label": "상태", "type": "select", "options": ["완료", "진행중", "예정", "사후관리"]}, {"id": "owner", "label": "담당자", "type": "text"}, {"id": "memo", "label": "메모", "type": "textarea"}], "rows": [{"id": "t_1vtx2u", "date": "2026-02-05", "cells": {"content": "[호랑이클럽] 1차기획안", "todo": "1차 기획안 -> 단톡방", "status": "완료", "owner": "밀리언치즈", "memo": "https://docs.google.com/document/d/1ba_NrfJ_VC3IoT28LOBypPa4xFDPPfxqmvItiDPifCY/edit?usp=sharing"}}, {"id": "t_rw1gqz", "date": "2026-02-09", "cells": {"content": "인플루언서 3명 웹세미나 참여check", "todo": "참석자 list-up -> 김봉연기자님", "status": "완료", "owner": "밀리언치즈", "memo": "10명"}}, {"id": "t_n029ls", "date": "2026-02-10", "cells": {"content": "상반기 기획안 검토 및 논의", "todo": "", "status": "완료", "owner": "전유선대표님", "memo": ""}}, {"id": "t_twqwfv", "date": "2026-02-11", "cells": {"content": "웹세미나", "todo": "리마인드 연락(17:30,치즈)", "status": "완료", "owner": "", "memo": "1. 행사 이메일 회신완료 2. 세미나 후기 회신 완료"}}, {"id": "t_62qjns", "date": "2026-02-13", "cells": {"content": "인플루언서 50명 중 1,2차 참석의사 확인", "todo": "1. 인스타계정 확보 2. DM발송", "status": "완료", "owner": "해완님(완료), 치즈(진행 중)", "memo": ""}}, {"id": "t_ba8vy2", "date": "2026-02-22", "cells": {"content": "예산기획", "todo": "", "status": "완료", "owner": "밀리언치즈", "memo": ""}}, {"id": "t_3aurgg", "date": "2026-02-23", "cells": {"content": "내부 제안할 호랑이클럽 멤버 확정", "todo": "", "status": "완료", "owner": "앤써컴퍼니", "memo": ""}}, {"id": "t_bwr3me", "date": "2026-02-24", "cells": {"content": "TIGER<->앤써컴퍼니 미팅(오후)", "todo": "", "status": "완료", "owner": "", "memo": ""}}, {"id": "t_qq68vy", "date": "2026-02-25", "cells": {"content": "", "todo": "", "status": "완료", "owner": "", "memo": ""}}, {"id": "t_nswvq2", "date": "2026-02-26", "cells": {"content": "공식제안서 제작 및 전달 및 확정", "todo": "제안서 제작(완료)", "status": "", "owner": "앤써컴퍼니, 밀리언치즈", "memo": ""}}, {"id": "t_mk7fyr", "date": "2026-02-27", "cells": {"content": "", "todo": "이메일 송부(완료)", "status": "", "owner": "", "memo": ""}}, {"id": "t_10x9x2", "date": "2026-02-28", "cells": {"content": "", "todo": "15명 최종명단 확정", "status": "", "owner": "", "memo": ""}}, {"id": "t_r3ycfy", "date": "2026-03-04", "cells": {"content": "간담회 오후 4시", "todo": "장소확정/장소 재 안내 연락", "status": "", "owner": "", "memo": "간담회 공지사항 리체크 필요/ 인플루언서별 이름표배치 등"}}, {"id": "t_aw0s4j", "date": "2026-03-06", "cells": {"content": "[공지방] [교육방] 개설", "todo": "", "status": "완료", "owner": "밀리언치즈", "memo": ""}}, {"id": "t_hd4emg", "date": "2026-03-09", "cells": {"content": "[교육방] ETF 적립식 투자 교육 시작", "todo": "", "status": "완료", "owner": "보라개미", "memo": ""}}, {"id": "t_9g3lfd", "date": "2026-03-11", "cells": {"content": "3월 가이드라인 배포", "todo": "", "status": "완료", "owner": "", "memo": ""}}, {"id": "t_uuuqtw", "date": "2026-03-13", "cells": {"content": "[크리에이터] 정산관련서류& 활동보드 안내", "todo": "제출 링크 이메일발송", "status": "완료", "owner": "밀리언치즈", "memo": ""}}, {"id": "t_3yyw82", "date": "2026-03-18", "cells": {"content": "인플루언서 웹세미나 18:30", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_7nxb06", "date": "2026-03-01", "cells": {"content": "앤써컴퍼니x밀리언치즈x보라개미 오프라인미팅", "todo": "", "status": "", "owner": "", "memo": "계약서여부/ 2기 활동방향 / 보라개미 교육방향성 / 신규멤버 영입방향"}}, {"id": "t_ws9eai", "date": "2026-04-01", "cells": {"content": "인플루언서 웹세미나 18:30", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_tc5jmu", "date": "2026-04-10", "cells": {"content": "3월 협업 건 지급 완료", "todo": "", "status": "완료", "owner": "", "memo": "별탱, 리자매 확인"}}, {"id": "t_apy33o", "date": "2026-04-15", "cells": {"content": "인플루언서 웹세미나 18:30", "todo": "", "status": "완료", "owner": "", "memo": ""}}, {"id": "t_q1bnrl", "date": "2026-04-16", "cells": {"content": "미래에셋 내부 미팅", "todo": "2기 가이드라인 변경 필요", "status": "완료", "owner": "", "memo": "1. 이벤트 포함 컨텐츠 - 보관처리\n2. 이벤트 하이라이트 심의필 확정"}}, {"id": "t_82e1rg", "date": "2026-04-17", "cells": {"content": "1. 이벤트 포함 컨텐츠 - 보관처리", "todo": "보관 혹은 수정처리 안내 완료", "status": "완료", "owner": "", "memo": ""}}, {"id": "t_3bi719", "date": "2026-04-27", "cells": {"content": "", "todo": "", "status": "", "owner": "", "memo": "4월 말 이벤트링크 + 업로드 완료 -> 5월 10일 \n5월 이벤트-> 개별 이메일 예정(하이라이트 이어 붙여도 상관없음)\n5월 자율 컨텐츠 -> 교육받은내용(자율컨텐츠) + 뉴스레터, 웨비나, 상장자료 이메일 예정(자율컨텐츠 안내 필요. 권장사항 + 기획안 컨펌과정 없다. 언급자체도 감사 + 우선언급 매우 감사."}}, {"id": "t_oshzl8", "date": "2026-05-08", "cells": {"content": "머니쇼", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_p67idq", "date": "2026-05-09", "cells": {"content": "머니쇼", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_pmvza4", "date": "2026-05-10", "cells": {"content": "머니쇼", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_dhwgnm", "date": "2026-05-11", "cells": {"content": "저녁 미팅 [2기관련]", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_7v6m17", "date": "2026-05-13", "cells": {"content": "웹세미나", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_06131r", "date": "2026-05-15", "cells": {"content": "", "todo": "", "status": "", "owner": "", "memo": "1. 9월 금감원 감사가 있음(그 전까진 규모 유지)\n2. 2기는 1기 수준을 유지\n3. 블로그처럼 바로 눈에 띄도록 가시적인 보고를 제공드릴예정(보완점 찾아보기)\n미래에셋자산운용측이 업데이트사항을 매번 볼 수 잇는 방향을 선호하긴 함. \n\n4. 1기 설문조사 + 연장희망 수요조사 진행 -> 2기 희망자는 최대한 가져가는 중\n5. 내부심사 기준을 세우기(협업 효과레벨)\n6. 최대 800만원 기준으로 리스트업리뉴얼\n7. 5월 하이라이트 업데이트 확인 할 것.\n8. 지금 집중할 부분: 단일종목레버리지(TIGER 운용보수가 가장 적다는 부분, KODEX 레버리지 비율이 9할인 상황)\n분위기 조성이 필요함."}}, {"id": "t_1gbw97", "date": "2026-05-18", "cells": {"content": "1기 설문조사 제작", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_y5nnlp", "date": "2026-05-19", "cells": {"content": "1기 설문조사", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_aocpk4", "date": "2026-05-20", "cells": {"content": "1기 설문조사", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_7wmapz", "date": "2026-05-21", "cells": {"content": "1기 설문조사", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_uah2ml", "date": "2026-05-22", "cells": {"content": "TIGER 팬페스타", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_tkcst2", "date": "2026-05-24", "cells": {"content": "호랑이클럽 2기 모집 안내문 발송", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_ajlvux", "date": "2026-05-25", "cells": {"content": "2기 준비 미팅", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_wreed4", "date": "2026-05-27", "cells": {"content": "2기 모집", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_xidvcs", "date": "2026-05-28", "cells": {"content": "미래에셋증권운용사 미팅, 2기 명단 확정", "todo": "", "status": "", "owner": "", "memo": "-> 이벤트로 고정하는것(official) / \n<- TIGER ETF를 어느정도 노출시켜도 되는건지 / 하면 좋은건지?\n\n->2기 방향성\n상품노출되지 않는 이벤트(1일~10일 업로드, 캡쳐본으로 기록 괜찮음)\n신규상품이 (상품명)(신규상장날) 노출되면 가장 BEST\n\n-> 2기 확정 / 협업액 통일(850내) / 웹세미나만 들어올 생각있는지\n-> [뉴스레터] 해당 상품을 참고하여 자율 콘텐츠 진행. 6/2\n-> (함께성장용) 웹세비나, 보라개미 시황, 시장 업데이트\n-> 2기 단톡방 새로 생성/ 컨텐츠는 단톡방에 업로드하며/ 진행상황 매주 업데이트\n-> 치즈가 컨텐츠 중요도를 개별 DM으로 언급할것"}}, {"id": "t_2dmbu2", "date": "2026-05-29", "cells": {"content": "꿀비님 A타입 추가", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_acmwb2", "date": "2026-05-30", "cells": {"content": "2기 단톡방 초대", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_8a08wq", "date": "2026-06-16", "cells": {"content": "웹세미나", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_pmu0dw", "date": "2026-06-23", "cells": {"content": "TIGER ETF 20주년 마라톤대회", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_mpbrhf", "date": "2026-07-06", "cells": {"content": "7월 하이라이트 이벤트 게시일정", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_1a2aed", "date": "2026-07-27", "cells": {"content": "7월 주식&컨텐츠 디깅(오프라인)", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_0jzhi1", "date": "2026-07-29", "cells": {"content": "웹세미나, TDF2045", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_7vgl1z", "date": "2026-08-03", "cells": {"content": "8월 호랑이클럽 활동 이메일 안내", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_6c5bzw", "date": "2026-08-12", "cells": {"content": "대표님 미팅", "todo": "", "status": "", "owner": "", "memo": ""}}, {"id": "t_rf4wx5", "date": "2026-08-20", "cells": {"content": "심의필 멤버들 협업비용 논의시점", "todo": "", "status": "", "owner": "", "memo": ""}}]}, "cohorts": [{"id": "gen1_2", "label": "1~2기 (2026년 6~8월)", "evalMonths": [{"id": "m6", "label": "6월", "items": [{"id": "notice", "label": "공지사항 확인"}, {"id": "highlight", "label": "하이라이트"}, {"id": "content", "label": "자율컨텐츠"}]}, {"id": "m7", "label": "7월", "items": [{"id": "highlight", "label": "하이라이트"}, {"id": "content", "label": "자율컨텐츠"}]}, {"id": "m8", "label": "8월", "items": [{"id": "highlight", "label": "하이라이트"}, {"id": "content", "label": "자율컨텐츠"}]}], "creators": [{"id": "c_pmhl4c", "name": "쭈미", "handle": "jjumi_s2", "followers": {"m6": 8000, "m7": 18000, "m8": 18000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DZH1SGLAf7R/?igsh=MXc1ZHJ2ODZja2hpNQ==", "metrics": {"views": 31000, "saves": 504, "shares": 198}, "settlement": {"amount": 250000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbVoOWeiSgU/?igsh=MW9hcHR2ZXJpNWgwMQ==", "metrics": {"views": 19118, "saves": 34, "shares": 21}, "settlement": {"amount": 250000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": false, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_cyhi0z", "name": "머니모니", "handle": "money__moni__", "followers": {"m6": 9000, "m7": 11000, "m8": 11000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DZuK897CFmK/?img_index=1\nhttps://moneymoni.stibee.com/p/24", "metrics": {"views": 14388, "saves": 177, "shares": 23}, "settlement": {"amount": 250000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbAidjYiWUU/?igsh=ZWg2anZ0bjV0N25v", "metrics": {"views": 6257, "saves": 59, "shares": 12}, "settlement": {"amount": 250000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": true, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_wxzjat", "name": "샐러리부부", "handle": "", "followers": {"m6": 10000, "m7": 10000, "m8": 10000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DZmTSKYEjxD/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", "metrics": {"views": 5344, "saves": 38, "shares": 7}, "settlement": {"amount": 350000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbJ520Oknpf/?igsh=d3NpcTVqZXkxdGJ2", "metrics": {"views": 11559, "saves": 117, "shares": 28}, "settlement": {"amount": 350000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": true, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_ertozb", "name": "낭콩", "handle": "nangkong.bean", "followers": {"m6": 13000, "m7": 18000, "m8": 18000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DZ9cnDjExjG/?img_index=2&igsh=ZmlpZHg1d2I2bmg5", "metrics": {"views": 112431, "saves": 2500, "shares": 678}, "settlement": {"amount": 250000, "method": "세금계산서", "note": "7/1 세금계산서 요청완료"}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbJlJU-k_Wk/?igsh=cHMzaWV5M2d1MHll", "metrics": {"views": 27400, "saves": 167, "shares": 18}, "settlement": {"amount": 250000, "method": "세금계산서", "note": "세금계산서 발행 요청 중"}}, "m8": {"checklist": {"highlight": true, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_satnzk", "name": "찡이", "handle": "jjingee__", "followers": {"m6": 19000, "m7": 20000, "m8": 20000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DZ4oEHAFGw8/?igsh=YTE2MThzZGkwajNl", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 750000, "method": "세금계산서", "note": "5월 400,000원\n6월 350,000원 합비용\n7/1 세금계산서 요청완료"}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DakmqO4lCn2/?igsh=MW9hM2F5M2JtZmV5Yg==", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 350000, "method": "세금계산서", "note": "세금계산서 발행완료"}}, "m8": {"checklist": {"highlight": false, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_ljk7jo", "name": "포슬", "handle": "four_seul", "followers": {"m6": 20000, "m7": 21000, "m8": 21000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DZxZL8TnyrC/?igsh=MXM5cDU0M2l5bWlhdw==", "metrics": {"views": 7020, "saves": 75, "shares": 15}, "settlement": {"amount": 450000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/Dbb3yAKE092/?img_index=1&igsh=MWJndHRpY2F3dnNudg==", "metrics": {"views": 29112, "saves": 613, "shares": 93}, "settlement": {"amount": 450000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": false, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_vzqw5j", "name": "밀리언치즈", "handle": "million_cheese", "followers": {"m6": 22000, "m7": 22000, "m8": 25000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DZ4y5gHHXZ3/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", "metrics": {"views": 67447, "saves": 2700, "shares": 802}, "settlement": {"amount": 450000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbUR5RIk4aX/?igsh=bHg5anBpMmVxOWlr", "metrics": {"views": 15000, "saves": 186, "shares": 20}, "settlement": {"amount": 450000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": true, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_t3fim0", "name": "김먀옹", "handle": "Kim.myao", "followers": {"m6": 23000, "m7": 23000, "m8": 23000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DaDPBR_mjrz/?igsh=MWV2ampwNnBoczR2dw==", "metrics": {"views": 12600, "saves": 165, "shares": 36}, "settlement": {"amount": 450000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbalfakmscK/?img_index=9&igsh=emFyMGFlanlidGE4", "metrics": {"views": 83000, "saves": 1800, "shares": 800}, "settlement": {"amount": 450000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": true, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_hbb3wn", "name": "별탱", "handle": "taengstar_", "followers": {"m6": 27000, "m7": 28000, "m8": 27000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DaB7FX9H9lU/?igsh=MWd6NDgwZmg4MnBhaQ==", "metrics": {"views": 22283, "saves": 141, "shares": 28}, "settlement": {"amount": 450000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbLGJi5FN1b/?igsh=czBjMXlrNTcycjl4", "metrics": {"views": 11469, "saves": 28, "shares": 7}, "settlement": {"amount": 450000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": false, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_73ewfq", "name": "똑경이", "handle": "ddock_economy", "followers": {"m6": 28000, "m7": 35000, "m8": 36000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DZH8rVDCQ5E/?img_index=1", "metrics": {"views": 224014, "saves": 4888, "shares": 3464}, "settlement": {"amount": 450000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/reel/DbFyFa7NvB6/?igsh=MTR4MGdzY3M2MjRmbg==", "metrics": {"views": 80864, "saves": 2000, "shares": 614}, "settlement": {"amount": 450000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": false, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_tl5ix1", "name": "덩굴이", "handle": "pumpvine_toon", "followers": {"m6": 30000, "m7": 31000, "m8": 31000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DaAVWmOgR2y/?igsh=bHRmNmltdmZsempp", "metrics": {"views": 31483, "saves": 424, "shares": 74}, "settlement": {"amount": 550000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DaZ-hkpgZ9p/?img_index=4&igsh=MWp5a3c5d3RvMDFucg==", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 550000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": true, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_aw1wxx", "name": "눙글", "handle": "nuungle", "followers": {"m6": 37000, "m7": 39000, "m8": 39000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/reel/DaA0RPHhDeG/?igsh=Y2ljcWJhMXZsZzY3", "metrics": {"views": 19215, "saves": 398, "shares": 152}, "settlement": {"amount": 550000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/reel/DbVezgFBfMa/?igsh=MTZuNGdrNzFiamppNw==", "metrics": {"views": 15334, "saves": 181, "shares": 82}, "settlement": {"amount": 550000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": true, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_ana4ak", "name": "부자람지", "handle": "buja.ramji", "followers": {"m6": 41000, "m7": 43000, "m8": 44000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/reel/DZHchkauleI/?igsh=MTlwa2psNW9tYTZ1OA==", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 650000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbU2M1NH3yC/?igsh=MXBpdXcwcXh4dGcwbg==", "metrics": {"views": 74275, "saves": 2900, "shares": 1500}, "settlement": {"amount": 650000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": true, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_6z5g5h", "name": "알파카", "handle": "alpaca_is_free", "followers": {"m6": 42000, "m7": 41000, "m8": 41000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DaCvp5qmr-u/?igsh=MTZoeWhvZzdqbmxicw==", "metrics": {"views": 21890, "saves": 35, "shares": 15}, "settlement": {"amount": 650000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbVq3x8Gjrj/?igsh=NHZueHFxYmI4d2pn", "metrics": {"views": 17064, "saves": 91, "shares": 8}, "settlement": {"amount": 650000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": false, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_un1hdl", "name": "꿀돈이", "handle": "", "followers": {"m6": 44000, "m7": 49000, "m8": 49000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DZBTorPk40-/?img_index=5&igsh=MXhmajNzdW1ybHJibg==", "metrics": {"views": 287000, "saves": 3400, "shares": 3420}, "settlement": {"amount": 650000, "method": "개인", "note": ""}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbWvP6ukwA6/?igsh=MTIwMGJnYTRzNGxhbw==", "metrics": {"views": 25890, "saves": 296, "shares": 55}, "settlement": {"amount": 650000, "method": "개인", "note": ""}}, "m8": {"checklist": {"highlight": false, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_9gbk39", "name": "리자매", "handle": "lii_sistar_", "followers": {"m6": 45000, "m7": 48000, "m8": 48000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DaFpDo5ki5V/?igsh=ZnNhczh6bThueHI=", "metrics": {"views": 22858, "saves": 217, "shares": 47}, "settlement": {"amount": 650000, "method": "세금계산서", "note": "6/30 세금계산서 발행"}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/reel/DbYEDLuy-fv/?igsh=cjVic2g1Nm9saGZ3", "metrics": {"views": 9627, "saves": 31, "shares": 10}, "settlement": {"amount": 650000, "method": "세금계산서", "note": "세금계산서 발행 요청 중"}}, "m8": {"checklist": {"highlight": false, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_h16vb9", "name": "쑤디", "handle": "suedie_log", "followers": {"m6": 58000, "m7": 66000, "m8": 67000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DZr2bdOE6wy/?igsh=Nnh1eHB0djIydzN5", "metrics": {"views": 92335, "saves": 2477, "shares": 557}, "settlement": {"amount": 750000, "method": "세금계산서", "note": "7/1 세금계산서 요청완료"}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbIkZOME3pH/?igsh=a3BqdW9pczFvcmR4", "metrics": {"views": 53473, "saves": 1589, "shares": 343}, "settlement": {"amount": 750000, "method": "세금계산서", "note": "세금계산서 발행완료"}}, "m8": {"checklist": {"highlight": true, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}, {"id": "c_0r5b46", "name": "꿀비", "handle": "ggulbees/", "followers": {"m6": 108000, "m7": 113000, "m8": 113000}, "months": {"m6": {"checklist": {"notice": true, "highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/reel/DZtpfhCSgN9/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", "metrics": {"views": 1680000, "saves": 5945, "shares": 1474}, "settlement": {"amount": 800000, "method": "세금계산서", "note": "7/1 세금계산서 요청완료"}}, "m7": {"checklist": {"highlight": true, "content": true}, "note": "", "link": "https://www.instagram.com/p/DbAJijDkoj9/", "metrics": {"views": 100000, "saves": 2600, "shares": 1000}, "settlement": {"amount": 800000, "method": "세금계산서", "note": "세금계산서 발행 요청 중"}}, "m8": {"checklist": {"highlight": true, "content": false}, "note": "", "link": "", "metrics": {"views": 0, "saves": 0, "shares": 0}, "settlement": {"amount": 0, "method": "", "note": ""}}}, "scheduleOverride": null}]}, {"id": "gen3", "label": "3기", "evalMonths": [], "creators": []}, {"id": "gen4", "label": "4기", "evalMonths": [], "creators": []}], "currentCohortId": "gen1_2"};
 
 const STORAGE_KEY = "tigerclub_admin_v2";
 
@@ -51,117 +51,57 @@ function rid(prefix){ return prefix + "_" + Math.random().toString(36).slice(2,9
 function esc(s){ return String(s ?? "").replace(/"/g,"&quot;"); }
 function escHtml(s){ return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function fmtNum(x){ return Number(x||0).toLocaleString("ko-KR"); }
+function fmtInputNum(x){ return Number(x||0).toLocaleString("ko-KR"); }
+function parseNumInput(s){ return Number(String(s).replace(/[^0-9.-]/g,""))||0; }
 function fmtPct(x){ return (x*100).toFixed(2) + "%"; }
 function nl2br(s){ return escHtml(s).replace(/\n/g,"<br/>"); }
 
+function migrateToCohorts(parsed){
+  // 예전 버전(기수 개념 없음) 데이터를 1~2기 코호트로 이전
+  if(parsed && !parsed.cohorts && parsed.creators){
+    const evalMonths = (parsed.settings && parsed.settings.evalMonths) || [];
+    parsed.cohorts = [
+      {id:"gen1_2", label:"1~2기 (2026년 6~8월)", evalMonths, creators: parsed.creators},
+      {id:"gen3", label:"3기", evalMonths:[], creators:[]},
+      {id:"gen4", label:"4기", evalMonths:[], creators:[]},
+    ];
+    parsed.currentCohortId = "gen1_2";
+    delete parsed.creators;
+    if(parsed.settings) delete parsed.settings.evalMonths;
+  }
+  return parsed;
+}
 function loadState(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw) return JSON.parse(raw);
+    if(raw) return migrateToCohorts(JSON.parse(raw));
   }catch(e){}
   const s = JSON.parse(JSON.stringify(SEED));
   s.updatedAt = Date.now();
   return s;
 }
-function saveState(fromRemote){
-  if(!fromRemote) state.updatedAt = Date.now();
+function getCurrentCohort(){
+  return state.cohorts.find(c=>c.id===state.currentCohortId) || state.cohorts[0];
+}
+function saveState(){
+  state.updatedAt = Date.now();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  if(!fromRemote) scheduleAutoPush();
 }
 
 let state = loadState();
 let currentTab = "eval";
 let expanded = new Set();
 let editingCell = null; // {tableKey, rowId, colId} - 범용 표(명단/타임라인)의 클릭-편집 상태
+let statsNonce = 0; // 페이지 진입/탭전환/기수전환 시 증가 -> 통계 카운트업 애니메이션 재생 트리거
+let lastAnimatedStatsNonce = -1;
 
-/* ---------------- 구글시트 실시간 동기화 ---------------- */
-const SYNC_CFG_KEY = "tigerclub_sync_cfg_v1";
-function loadSyncConfig(){
-  try{
-    const raw = localStorage.getItem(SYNC_CFG_KEY);
-    if(raw) return JSON.parse(raw);
-  }catch(e){}
-  return { url:"", token:"", autoSync:false };
-}
-function saveSyncConfig(){ localStorage.setItem(SYNC_CFG_KEY, JSON.stringify(syncConfig)); }
-
-let syncConfig = loadSyncConfig();
-let syncStatus = { state:"idle", message:"", at:null }; // idle | syncing | ok | error
-let pushTimer = null;
-let pollTimer = null;
-
-function syncUrlWithToken(){
-  if(!syncConfig.url) return null;
-  const sep = syncConfig.url.includes("?") ? "&" : "?";
-  return syncConfig.token ? syncConfig.url + sep + "token=" + encodeURIComponent(syncConfig.token) : syncConfig.url;
-}
-function setSyncField(field, value){
-  syncConfig[field] = value; saveSyncConfig(); render();
-}
-function toggleAutoSync(){
-  syncConfig.autoSync = !syncConfig.autoSync;
-  saveSyncConfig();
-  setupAutoSyncPolling();
-  render();
-}
-function scheduleAutoPush(){
-  if(!syncConfig.url || !syncConfig.autoSync) return;
-  clearTimeout(pushTimer);
-  pushTimer = setTimeout(()=> pushToSheet(true), 1500);
-}
-function setupAutoSyncPolling(){
-  clearInterval(pollTimer);
-  if(syncConfig.url && syncConfig.autoSync){
-    pollTimer = setInterval(()=> pullFromSheet(true), 20000);
-  }
-}
-async function pushToSheet(silent){
-  const url = syncUrlWithToken();
-  if(!url){ if(!silent) alert("먼저 구글시트 웹앱 URL을 입력해주세요."); return; }
-  syncStatus = { state:"syncing", message:"업로드 중...", at: syncStatus.at };
-  if(!silent) render();
-  try{
-    const res = await fetch(url, { method:"POST", body: JSON.stringify(state) });
-    const data = await res.json();
-    if(data && data.error){ throw new Error(data.error); }
-    syncStatus = { state:"ok", message:"업로드 완료", at: Date.now() };
-    if(!silent) alert("구글시트로 업로드했습니다.");
-  }catch(err){
-    syncStatus = { state:"error", message:"업로드 실패: " + err.message, at: Date.now() };
-    if(!silent) alert("업로드 실패했습니다. URL/토큰과 배포 권한(전체 공개)을 확인해주세요.\n" + err.message);
-  }
-  render();
-}
-async function pullFromSheet(silent){
-  const url = syncUrlWithToken();
-  if(!url){ if(!silent) alert("먼저 구글시트 웹앱 URL을 입력해주세요."); return; }
-  syncStatus = { state:"syncing", message:"불러오는 중...", at: syncStatus.at };
-  if(!silent) render();
-  try{
-    const res = await fetch(url, { method:"GET" });
-    const remote = await res.json();
-    if(remote && remote.error){ throw new Error(remote.error); }
-    if(remote && remote.creators && (!state.updatedAt || (remote.updatedAt||0) > state.updatedAt)){
-      state = remote;
-      saveState(true);
-      expanded = new Set();
-    }
-    syncStatus = { state:"ok", message:"동기화됨", at: Date.now() };
-    if(!silent) alert("최신 데이터를 불러왔습니다.");
-  }catch(err){
-    syncStatus = { state:"error", message:"불러오기 실패: " + err.message, at: Date.now() };
-    if(!silent) alert("불러오기 실패했습니다. URL/토큰과 배포 권한(전체 공개)을 확인해주세요.\n" + err.message);
-  }
-  render();
-}
-function testSyncConnection(){ pullFromSheet(false); }
-
-/* ---------------- 활동평가 채점 로직 ---------------- */
-function computeEvalDerived(){
+/* ---------------- 활동사항 채점 로직 ---------------- */
+function computeEvalDerived(cohort){
   const s = state.settings;
-  const withSchedule = state.creators.map(c=>{
+  const evalMonths = cohort.evalMonths;
+  const withSchedule = cohort.creators.map(c=>{
     let totalItems=0, checkedItems=0;
-    s.evalMonths.forEach(m=>{
+    evalMonths.forEach(m=>{
       const md = c.months[m.id];
       (m.items||[]).forEach(it=>{
         totalItems++;
@@ -173,13 +113,13 @@ function computeEvalDerived(){
     const scheduleScore = (c.scheduleOverride!==null && c.scheduleOverride!==undefined) ? c.scheduleOverride : autoScore;
 
     let followers = 0;
-    for(let i=s.evalMonths.length-1;i>=0;i--){
-      const mid = s.evalMonths[i].id;
+    for(let i=evalMonths.length-1;i>=0;i--){
+      const mid = evalMonths[i].id;
       if(c.followers && c.followers[mid]){ followers = c.followers[mid]; break; }
     }
 
     const sums = [];
-    s.evalMonths.forEach(m=>{
+    evalMonths.forEach(m=>{
       const md = c.months[m.id];
       if(md && md.metrics){
         const sum = s.metricFields.reduce((acc,f)=> acc + (Number(md.metrics[f.id])||0), 0);
@@ -226,59 +166,85 @@ function ensureMonth(c, monthId){
   return c.months[monthId];
 }
 
-/* ---------------- 이벤트 핸들러: 활동평가 ---------------- */
+/* ---------------- 이벤트 핸들러: 활동사항 ---------------- */
 function toggleExpand(id){ expanded.has(id) ? expanded.delete(id) : expanded.add(id); render(); }
 function addCreator(){
   const name = prompt("크리에이터 이름을 입력하세요");
   if(!name) return;
+  const cohort = getCurrentCohort();
   const c = {id: rid("c"), name, handle:"", followers:{}, months:{}, scheduleOverride:null};
-  state.settings.evalMonths.forEach(m=> ensureMonth(c, m.id));
-  state.creators.push(c);
+  cohort.evalMonths.forEach(m=> ensureMonth(c, m.id));
+  cohort.creators.push(c);
   expanded.add(c.id);
   saveState(); render();
 }
 function deleteCreator(id){
-  const c = state.creators.find(x=>x.id===id);
+  const cohort = getCurrentCohort();
+  const c = cohort.creators.find(x=>x.id===id);
   if(!c) return;
   if(!confirm(c.name + " 크리에이터를 삭제할까요?")) return;
-  state.creators = state.creators.filter(x=>x.id!==id);
+  cohort.creators = cohort.creators.filter(x=>x.id!==id);
   saveState(); render();
 }
 function updateCreatorField(id, field, value){
-  const c = state.creators.find(x=>x.id===id); if(!c) return;
+  const c = getCurrentCohort().creators.find(x=>x.id===id); if(!c) return;
   c[field] = value; saveState(); render();
 }
 function updateFollowers(id, monthId, value){
-  const c = state.creators.find(x=>x.id===id); if(!c) return;
+  const c = getCurrentCohort().creators.find(x=>x.id===id); if(!c) return;
   ensureMonth(c, monthId);
   c.followers[monthId] = Math.max(0, Number(value)||0);
   saveState(); render();
 }
 function updateChecklist(id, monthId, itemId, checked){
-  const c = state.creators.find(x=>x.id===id); if(!c) return;
+  const c = getCurrentCohort().creators.find(x=>x.id===id); if(!c) return;
   const md = ensureMonth(c, monthId);
   md.checklist[itemId] = checked;
   saveState(); render();
 }
 function updateMonthText(id, monthId, field, value){
-  const c = state.creators.find(x=>x.id===id); if(!c) return;
+  const c = getCurrentCohort().creators.find(x=>x.id===id); if(!c) return;
   const md = ensureMonth(c, monthId);
   md[field] = value; saveState(); render();
 }
 function updateMetric(id, monthId, metricId, value){
-  const c = state.creators.find(x=>x.id===id); if(!c) return;
+  const c = getCurrentCohort().creators.find(x=>x.id===id); if(!c) return;
   const md = ensureMonth(c, monthId);
   md.metrics[metricId] = Math.max(0, Number(value)||0);
   saveState(); render();
 }
 function updateSettlement(id, monthId, fieldId, value){
-  const c = state.creators.find(x=>x.id===id); if(!c) return;
+  const c = getCurrentCohort().creators.find(x=>x.id===id); if(!c) return;
   const md = ensureMonth(c, monthId);
   md.settlement[fieldId] = value; saveState(); render();
 }
 function updateScheduleOverride(id, value){
-  const c = state.creators.find(x=>x.id===id); if(!c) return;
+  const c = getCurrentCohort().creators.find(x=>x.id===id); if(!c) return;
   c.scheduleOverride = value===""? null : Number(value);
+  saveState(); render();
+}
+
+/* ---------------- 기수(시즌) 관리 ---------------- */
+function setCohort(id){
+  state.currentCohortId = id; expanded = new Set(); statsNonce++; saveState(); render();
+}
+function addCohort(){
+  const label = prompt("추가할 기수 이름 (예: 5기)"); if(!label) return;
+  const c = {id: rid("gen"), label, evalMonths:[], creators:[]};
+  state.cohorts.push(c);
+  state.currentCohortId = c.id;
+  saveState(); render();
+}
+function renameCohort(id, label){
+  const c = state.cohorts.find(x=>x.id===id); if(!c) return;
+  c.label = label; saveState(); render();
+}
+function deleteCohort(id){
+  if(state.cohorts.length<=1){ alert("최소 1개의 기수는 있어야 합니다."); return; }
+  const c = state.cohorts.find(x=>x.id===id); if(!c) return;
+  if(!confirm(c.label + " 기수를 삭제할까요? 해당 기수의 모든 활동사항 데이터가 함께 삭제됩니다.")) return;
+  state.cohorts = state.cohorts.filter(x=>x.id!==id);
+  if(state.currentCohortId===id) state.currentCohortId = state.cohorts[0].id;
   saveState(); render();
 }
 
@@ -289,33 +255,34 @@ function updateSettingNum(field, value){
 }
 function addEvalMonth(){
   const label = prompt("추가할 월/평가기간 이름 (예: 9월)"); if(!label) return;
-  state.settings.evalMonths.push({id: rid("m"), label, items:[]});
+  getCurrentCohort().evalMonths.push({id: rid("m"), label, items:[]});
   saveState(); render();
 }
 function removeEvalMonth(monthId){
-  const m = state.settings.evalMonths.find(x=>x.id===monthId); if(!m) return;
+  const evalMonths = getCurrentCohort().evalMonths;
+  const m = evalMonths.find(x=>x.id===monthId); if(!m) return;
   if(!confirm(m.label + " 평가월을 삭제할까요? (개별 입력 데이터는 유지되지만 채점에서 제외됩니다)")) return;
-  state.settings.evalMonths = state.settings.evalMonths.filter(x=>x.id!==monthId);
+  getCurrentCohort().evalMonths = evalMonths.filter(x=>x.id!==monthId);
   saveState(); render();
 }
 function renameEvalMonth(monthId, label){
-  const m = state.settings.evalMonths.find(x=>x.id===monthId); if(!m) return;
+  const m = getCurrentCohort().evalMonths.find(x=>x.id===monthId); if(!m) return;
   m.label = label; saveState(); render();
 }
 function addEvalItem(monthId){
   const label = prompt("추가할 체크 항목 이름"); if(!label) return;
-  const m = state.settings.evalMonths.find(x=>x.id===monthId); if(!m) return;
+  const m = getCurrentCohort().evalMonths.find(x=>x.id===monthId); if(!m) return;
   m.items.push({id: rid("it"), label});
   saveState(); render();
 }
 function removeEvalItem(monthId, itemId){
-  const m = state.settings.evalMonths.find(x=>x.id===monthId); if(!m) return;
+  const m = getCurrentCohort().evalMonths.find(x=>x.id===monthId); if(!m) return;
   if(!confirm("이 체크 항목을 삭제할까요?")) return;
   m.items = m.items.filter(x=>x.id!==itemId);
   saveState(); render();
 }
 function renameEvalItem(monthId, itemId, label){
-  const m = state.settings.evalMonths.find(x=>x.id===monthId); if(!m) return;
+  const m = getCurrentCohort().evalMonths.find(x=>x.id===monthId); if(!m) return;
   const it = m.items.find(x=>x.id===itemId); if(!it) return;
   it.label = label; saveState(); render();
 }
@@ -409,6 +376,7 @@ function commitCell(tableKey, rowId, colId, value){
 function typeBadgeHtml(val){
   if(val==="A") return `<span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300">A</span>`;
   if(val==="B") return `<span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-sky-100 text-sky-800 border border-sky-300">B</span>`;
+  if(val==="P") return `<span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-violet-100 text-violet-800 border border-violet-300">P</span>`;
   if(!val) return `<span class="text-slate-300">-</span>`;
   return `<span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-300">${escHtml(val)}</span>`;
 }
@@ -484,7 +452,7 @@ function renderGenericTable(tableKey, title){
   `;
 }
 
-/* ---------------- 활동평가 탭 렌더 ---------------- */
+/* ---------------- 활동사항 탭 렌더 ---------------- */
 function monthDotsHtml(c, m){
   const md = c.months[m.id];
   return (m.items||[]).map(it=>{
@@ -537,7 +505,8 @@ function applyEvalFilterSort(derived){
 }
 
 function renderEvalTab(){
-  const derived = computeEvalDerived();
+  const cohort = getCurrentCohort();
+  const derived = computeEvalDerived(cohort);
   const counts = {Graduation:0, Pass:0, Review:0, Adjust:0};
   derived.forEach(c=> counts[c.status]++);
   const s = state.settings;
@@ -545,6 +514,17 @@ function renderEvalTab(){
   const filterActive = evalFilter.search.trim() !== "" || evalFilter.statuses.size > 0 || evalSort.key !== "totalScore" || evalSort.dir !== "desc";
 
   return `
+    <div class="flex items-center gap-2 mb-4 flex-wrap">
+      <span class="text-xs text-slate-500 font-semibold">기수:</span>
+      ${state.cohorts.map(co=>`<button onclick="setCohort('${co.id}')" class="px-3 py-1.5 rounded-lg text-sm font-semibold transition ${co.id===state.currentCohortId ? "bg-orange-500 text-white" : "bg-white border border-slate-200 text-slate-600 hover:bg-orange-50"}">${escHtml(co.label)}</button>`).join("")}
+      <button onclick="setTab('settings')" class="text-xs text-slate-400 hover:text-orange-600 ml-1">+ 기수 관리</button>
+    </div>
+
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      ${donutFollowerCardHtml(derived)}
+      ${metricStatsCardHtml(cohort, derived)}
+    </section>
+
     <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
       ${summaryCard("Graduation", counts.Graduation, "border-purple-400", "text-purple-600", evalFilter.statuses.has("Graduation"))}
       ${summaryCard("Pass", counts.Pass, "border-green-400", "text-green-600", evalFilter.statuses.has("Pass"))}
@@ -554,7 +534,7 @@ function renderEvalTab(){
 
     <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-6">
       <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-3 border-b border-slate-100">
-        <h2 class="font-bold text-slate-800">크리에이터 활동평가 (${list.length}/${derived.length}명)</h2>
+        <h2 class="font-bold text-slate-800">크리에이터 활동사항 (${list.length}/${derived.length}명)</h2>
         <div class="flex gap-2">
           <button onclick="addCreator()" class="px-3 py-1.5 text-sm font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-700">+ 크리에이터 추가</button>
           <button onclick="exportJson()" class="px-3 py-1.5 text-sm font-semibold border border-slate-300 rounded-lg hover:bg-slate-50">Export JSON</button>
@@ -580,17 +560,17 @@ function renderEvalTab(){
             <tr class="text-left text-slate-500 border-b border-slate-100">
               <th class="px-3 py-2 min-w-[100px] cursor-pointer select-none hover:text-slate-800" onclick="setEvalSort('name')">이름 ${sortArrow("name")}</th>
               <th class="px-3 py-2 min-w-[90px] cursor-pointer select-none hover:text-slate-800" onclick="setEvalSort('followers')">팔로워 ${sortArrow("followers")}</th>
-              ${s.evalMonths.map(m=>`<th class="px-3 py-2 min-w-[70px]">${escHtml(m.label)}</th>`).join("")}
+              ${cohort.evalMonths.map(m=>`<th class="px-3 py-2 min-w-[70px]">${escHtml(m.label)}</th>`).join("")}
               <th class="px-3 py-2 min-w-[90px] cursor-pointer select-none hover:text-slate-800" onclick="setEvalSort('rate')">반응률 ${sortArrow("rate")}</th>
               <th class="px-3 py-2 min-w-[70px] cursor-pointer select-none hover:text-slate-800" onclick="setEvalSort('performanceScore')">성과점수 ${sortArrow("performanceScore")}</th>
               <th class="px-3 py-2 min-w-[70px] cursor-pointer select-none hover:text-slate-800" onclick="setEvalSort('scheduleScore')">일정점수 ${sortArrow("scheduleScore")}</th>
               <th class="px-3 py-2 min-w-[60px] cursor-pointer select-none hover:text-slate-800" onclick="setEvalSort('totalScore')">총점 ${sortArrow("totalScore")}</th>
-              <th class="px-3 py-2 min-w-[110px] cursor-pointer select-none hover:text-slate-800" onclick="setEvalSort('status')">연장 판정 ${sortArrow("status")}</th>
+              <th class="px-3 py-2 min-w-[110px] cursor-pointer select-none hover:text-slate-800" onclick="setEvalSort('status')">Status ${sortArrow("status")}</th>
               <th class="px-3 py-2 min-w-[60px]"></th>
             </tr>
           </thead>
           <tbody>
-            ${list.length ? list.map(c=> evalRowHtml(c, expanded.has(c.id))).join("") : `<tr><td colspan="${8+s.evalMonths.length}" class="px-3 py-8 text-center text-slate-400 text-sm">조건에 맞는 크리에이터가 없습니다.</td></tr>`}
+            ${list.length ? list.map(c=> evalRowHtml(c, expanded.has(c.id), cohort)).join("") : `<tr><td colspan="${8+cohort.evalMonths.length}" class="px-3 py-8 text-center text-slate-400 text-sm">${cohort.creators.length===0 ? "이 기수에는 아직 등록된 크리에이터가 없습니다. + 크리에이터 추가로 시작하세요." : "조건에 맞는 크리에이터가 없습니다."}</td></tr>`}
           </tbody>
         </table>
       </div>
@@ -600,13 +580,13 @@ function renderEvalTab(){
       <p class="font-semibold text-slate-600 mb-1">채점 기준 (설정 탭에서 항목/기준 조정 가능)</p>
       <p>· 일정 점수(자동 제안): 설정된 평가월 전체 체크 항목 중 미이행 0개 → 5점, 1~2개 → 3점, 3개 이상 → 1점. 상세보기에서 수동 조정 가능.</p>
       <p>· 성과 점수: (반응지표 합계 ÷ 팔로워) 반응률을 전체 인원 기준 상대 순위로 상위 1/3 → 5점, 중위 1/3 → 3점, 하위 1/3 → 1점.</p>
-      <p>· 연장 판정: 팔로워 ${fmtNum(s.graduationFollowers)}명 이상은 총점과 무관하게 Graduation. 그 외 총점 ${s.passMin}~10점 Pass · ${s.reviewMin}~${s.passMin-1}점 Review · ${s.reviewMin-1}점 이하 Adjust.</p>
+      <p>· Status: 팔로워 ${fmtNum(s.graduationFollowers)}명 이상은 총점과 무관하게 Graduation. 그 외 총점 ${s.passMin}~10점 Pass · ${s.reviewMin}~${s.passMin-1}점 Review · ${s.reviewMin-1}점 이하 Adjust.</p>
     </section>
   `;
 }
 
 function sortLabel(key){
-  const map = {name:"이름", followers:"팔로워", rate:"반응률", performanceScore:"성과점수", scheduleScore:"일정점수", totalScore:"총점", status:"연장판정"};
+  const map = {name:"이름", followers:"팔로워", rate:"반응률", performanceScore:"성과점수", scheduleScore:"일정점수", totalScore:"총점", status:"Status"};
   return map[key] || key;
 }
 function statusChipClass(status){
@@ -625,13 +605,108 @@ function summaryCard(label, count, borderClass, textClass, active){
   `;
 }
 
-function evalRowHtml(c, isExpanded){
+/* ---------------- 팔로워 도넛차트 + 반응지표 카운트업 위젯 ---------------- */
+function metricEmoji(id){
+  if(id==="views") return "👁️";
+  if(id==="saves") return "💾";
+  if(id==="shares") return "📤";
+  if(id==="likes") return "❤️";
+  if(id==="comments") return "💬";
+  return "📈";
+}
+
+function donutFollowerCardHtml(list){
+  const total = list.reduce((sum,c)=> sum + (c.followers||0), 0);
+  const R = 45, C = 2*Math.PI*R;
+  const sorted = [...list].sort((a,b)=> (b.followers||0)-(a.followers||0));
+  const n = Math.max(1, sorted.length);
+  const colored = sorted.map((c,i)=> ({...c, color: `hsl(${Math.round(i*360/n)},65%,55%)`}));
+  let offset = 0;
+  const segs = colored.map(c=>{
+    const frac = total>0 ? (c.followers||0)/total : 0;
+    const dash = frac*C;
+    const html = `<circle cx="60" cy="60" r="${R}" fill="none" stroke="${c.color}" stroke-width="14" stroke-dasharray="${dash.toFixed(2)} ${(C-dash).toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}"><title>${escHtml(c.name||"")}: ${fmtNum(c.followers||0)}명 (${(frac*100).toFixed(1)}%)</title></circle>`;
+    offset += dash;
+    return html;
+  }).join("");
+  const legend = colored.map(c=>{
+    const pct = total>0 ? ((c.followers||0)/total*100).toFixed(1) : "0.0";
+    return `<div class="flex items-center gap-1.5 text-xs"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${c.color}"></span><span class="truncate flex-1">${escHtml(c.name||"")}</span><span class="text-slate-400 tabular-nums shrink-0">${pct}%</span></div>`;
+  }).join("");
+  return `
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex items-center gap-5">
+      <div class="relative w-28 h-28 shrink-0">
+        <svg viewBox="0 0 120 120" class="w-28 h-28 -rotate-90">
+          <circle cx="60" cy="60" r="${R}" fill="none" stroke="#e2e8f0" stroke-width="14" />
+          ${segs}
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+          <div class="text-[10px] text-slate-400">합산 팔로워</div>
+          <div class="stat-count font-extrabold text-slate-800 text-base tabular-nums" data-target="${total}">0</div>
+        </div>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-xs font-semibold text-slate-500 mb-2">크리에이터별 팔로워 비중 (${list.length}명)</div>
+        <div class="space-y-1 max-h-28 overflow-y-auto pr-1">
+          ${legend || `<div class="text-xs text-slate-300">데이터 없음</div>`}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function metricStatsCardHtml(cohort, list){
   const s = state.settings;
+  const fields = s.metricFields || [];
+  const sums = fields.map(f=>{
+    let sum = 0;
+    list.forEach(c=>{
+      (cohort.evalMonths||[]).forEach(m=>{
+        const md = c.months ? c.months[m.id] : null;
+        if(md && md.metrics) sum += Number(md.metrics[f.id]) || 0;
+      });
+    });
+    return {...f, sum};
+  });
+  return `
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+      <div class="text-xs font-semibold text-slate-500 mb-3">이 기수 반응지표 합계</div>
+      <div class="grid grid-cols-3 gap-3">
+        ${sums.length ? sums.map(f=>`
+          <div class="text-center">
+            <div class="text-2xl mb-1">${metricEmoji(f.id)}</div>
+            <div class="stat-count text-lg font-extrabold text-slate-800 tabular-nums" data-target="${f.sum}">0</div>
+            <div class="text-[11px] text-slate-400 mt-0.5 truncate">${escHtml(f.label)}</div>
+          </div>`).join("") : `<div class="col-span-3 text-xs text-slate-300 text-center py-2">반응지표가 없습니다</div>`}
+      </div>
+    </div>
+  `;
+}
+
+function animateStatNumbers(){
+  const els = document.querySelectorAll(".stat-count");
+  els.forEach(el=>{
+    const target = Number(el.getAttribute("data-target")) || 0;
+    const duration = 900;
+    const start = (typeof performance !== "undefined" ? performance.now() : Date.now());
+    function step(now){
+      const p = Math.min(1, (now-start)/duration);
+      const eased = 1 - Math.pow(1-p, 3);
+      const val = Math.round(target*eased);
+      el.textContent = val.toLocaleString("ko-KR");
+      if(p<1) requestAnimationFrame(step);
+      else el.textContent = target.toLocaleString("ko-KR");
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+function evalRowHtml(c, isExpanded, cohort){
   return `
     <tr class="border-b border-slate-50 hover:bg-slate-50/60 align-top">
       <td class="px-3 py-2 font-semibold text-slate-800">${escHtml(c.name)}</td>
       <td class="px-3 py-2">${fmtNum(c.followers)}</td>
-      ${s.evalMonths.map(m=>`<td class="px-3 py-2">${monthDotsHtml(c,m)}</td>`).join("")}
+      ${cohort.evalMonths.map(m=>`<td class="px-3 py-2">${monthDotsHtml(c,m)}</td>`).join("")}
       <td class="px-3 py-2 tabular-nums">${fmtPct(c.rate)}</td>
       <td class="px-3 py-2 font-semibold">${c.performanceScore}</td>
       <td class="px-3 py-2 font-semibold">${c.scheduleScore}${c.scheduleOverride!==null?'<span class="text-[10px] text-slate-400 ml-1">(수동)</span>':""}</td>
@@ -639,15 +714,14 @@ function evalRowHtml(c, isExpanded){
       <td class="px-3 py-2"><span class="chip ${c.statusClass}">${c.status}</span></td>
       <td class="px-3 py-2 text-right whitespace-nowrap"><button onclick="toggleExpand('${c.id}')" class="text-slate-500 hover:text-slate-900 text-xs font-semibold">${isExpanded?"접기":"상세"}</button></td>
     </tr>
-    ${isExpanded ? evalDetailHtml(c) : ""}
+    ${isExpanded ? evalDetailHtml(c, cohort) : ""}
   `;
 }
 
-function evalDetailHtml(c){
-  const s = state.settings;
+function evalDetailHtml(c, cohort){
   return `
     <tr class="bg-slate-50/70 border-b border-slate-100">
-      <td colspan="${5+s.evalMonths.length}" class="px-4 py-4">
+      <td colspan="${5+cohort.evalMonths.length}" class="px-4 py-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
           <label class="block">
             <span class="text-xs text-slate-500">이름</span>
@@ -659,7 +733,7 @@ function evalDetailHtml(c){
           </label>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-          ${s.evalMonths.map(m=> monthEditorHtml(c, m)).join("")}
+          ${cohort.evalMonths.length ? cohort.evalMonths.map(m=> monthEditorHtml(c, m)).join("") : `<p class="text-xs text-slate-400 md:col-span-3">이 기수에는 평가월이 아직 없습니다. 설정 탭 &gt; "평가월 & 일정 체크항목"에서 추가해주세요.</p>`}
         </div>
         <div class="flex flex-wrap items-center gap-3">
           <label class="text-xs text-slate-500 flex items-center gap-2">
@@ -699,13 +773,16 @@ function monthEditorHtml(c, m){
       </div>
       <label class="block">
         <span class="text-[11px] text-slate-500">증빙/컨텐츠 링크</span>
-        <input type="text" value="${esc(md.link)}" onchange="updateMonthText('${c.id}','${m.id}','link',this.value)" class="w-full border border-slate-200 rounded px-2 py-1 mt-0.5" placeholder="https://..." />
+        <div class="flex items-center gap-1 mt-0.5">
+          <input type="text" value="${esc(md.link)}" onchange="updateMonthText('${c.id}','${m.id}','link',this.value)" class="flex-1 border border-slate-200 rounded px-2 py-1" placeholder="https://..." />
+          ${md.link ? `<a href="${esc(md.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="shrink-0 px-2 py-1 border border-slate-200 rounded text-slate-500 hover:text-orange-600 hover:border-orange-300" title="새 탭에서 링크 열기">↗</a>` : ""}
+        </div>
       </label>
       <div class="grid grid-cols-3 gap-1.5">
         ${s.metricFields.map(f=>`
           <label class="block">
             <span class="text-[10px] text-slate-500">${escHtml(f.label)}</span>
-            <input type="number" min="0" value="${(md.metrics&&md.metrics[f.id])||0}" onchange="updateMetric('${c.id}','${m.id}','${f.id}',this.value)" class="w-full border border-slate-200 rounded px-1.5 py-1 mt-0.5" />
+            <input type="text" inputmode="numeric" value="${fmtInputNum((md.metrics&&md.metrics[f.id])||0)}" onchange="updateMetric('${c.id}','${m.id}','${f.id}', parseNumInput(this.value))" class="w-full border border-slate-200 rounded px-1.5 py-1 mt-0.5 text-right" />
           </label>`).join("")}
       </div>
       <div class="grid grid-cols-1 gap-1.5 border-t border-slate-100 pt-2">
@@ -716,8 +793,10 @@ function monthEditorHtml(c, m){
             const opts = (f.options||[]).map(o=>`<option value="${esc(o)}" ${val===o?"selected":""}>${escHtml(o)}</option>`).join("");
             return `<label class="block"><span class="text-[10px] text-slate-500">${escHtml(f.label)}</span><select onchange="updateSettlement('${c.id}','${m.id}','${f.id}',this.value)" class="w-full border border-slate-200 rounded px-1.5 py-1 mt-0.5"><option value="">-</option>${opts}</select></label>`;
           }
-          const type = f.type==="number" ? "number" : "text";
-          return `<label class="block"><span class="text-[10px] text-slate-500">${escHtml(f.label)}</span><input type="${type}" value="${esc(val)}" onchange="updateSettlement('${c.id}','${m.id}','${f.id}',this.value)" class="w-full border border-slate-200 rounded px-1.5 py-1 mt-0.5" /></label>`;
+          if(f.type==="number"){
+            return `<label class="block"><span class="text-[10px] text-slate-500">${escHtml(f.label)}</span><input type="text" inputmode="numeric" value="${fmtInputNum(val)}" onchange="updateSettlement('${c.id}','${m.id}','${f.id}', parseNumInput(this.value))" class="w-full border border-slate-200 rounded px-1.5 py-1 mt-0.5 text-right" /></label>`;
+          }
+          return `<label class="block"><span class="text-[10px] text-slate-500">${escHtml(f.label)}</span><input type="text" value="${esc(val)}" onchange="updateSettlement('${c.id}','${m.id}','${f.id}',this.value)" class="w-full border border-slate-200 rounded px-1.5 py-1 mt-0.5" /></label>`;
         }).join("")}
       </div>
       <label class="block">
@@ -729,53 +808,28 @@ function monthEditorHtml(c, m){
 }
 
 /* ---------------- 설정 탭 렌더 ---------------- */
-function fmtSyncTime(ts){
-  if(!ts) return "-";
-  return new Date(ts).toLocaleString("ko-KR", {hour12:false});
-}
-function syncStatusDot(){
-  if(syncStatus.state==="ok") return `<span class="inline-block w-2 h-2 rounded-full bg-green-500"></span>`;
-  if(syncStatus.state==="error") return `<span class="inline-block w-2 h-2 rounded-full bg-red-500"></span>`;
-  if(syncStatus.state==="syncing") return `<span class="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>`;
-  return `<span class="inline-block w-2 h-2 rounded-full bg-slate-300"></span>`;
-}
-function renderSyncSection(){
-  return `
-    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 mb-6">
-      <div class="flex items-center justify-between mb-1">
-        <h2 class="font-bold text-slate-800">구글시트 실시간 동기화</h2>
-        <div class="flex items-center gap-1.5 text-xs text-slate-500">${syncStatusDot()} ${syncStatus.message || "미연결"} ${syncStatus.at ? "· " + fmtSyncTime(syncStatus.at) : ""}</div>
-      </div>
-      <p class="text-xs text-slate-400 mb-3">구글시트에 배포한 Apps Script 웹앱 URL을 연결하면, 이 브라우저의 변경사항이 자동으로 업로드되고 다른 사람의 변경사항도 주기적으로 불러옵니다. (설치 방법은 함께 드린 Code.gs 파일 상단 주석 참고)</p>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-        <label class="block">
-          <span class="text-xs text-slate-500">Apps Script 웹앱 URL</span>
-          <input type="text" value="${esc(syncConfig.url)}" onchange="setSyncField('url', this.value)" placeholder="https://script.google.com/macros/s/.../exec" class="w-full border border-slate-300 rounded-lg px-2 py-1.5 mt-0.5" />
-        </label>
-        <label class="block">
-          <span class="text-xs text-slate-500">비밀 토큰 (Code.gs의 SECRET_TOKEN과 동일하게)</span>
-          <input type="text" value="${esc(syncConfig.token)}" onchange="setSyncField('token', this.value)" placeholder="tigerclub2026" class="w-full border border-slate-300 rounded-lg px-2 py-1.5 mt-0.5" />
-        </label>
-      </div>
-      <div class="flex flex-wrap items-center gap-2">
-        <label class="flex items-center gap-1.5 text-xs text-slate-600 mr-2">
-          <input type="checkbox" ${syncConfig.autoSync?"checked":""} onchange="toggleAutoSync()" class="w-4 h-4" /> 자동 동기화 (편집 시 자동 업로드 + 20초마다 자동 새로고침)
-        </label>
-        <button onclick="pushToSheet(false)" class="px-3 py-1.5 text-xs font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-700">지금 업로드 (내 데이터 → 시트)</button>
-        <button onclick="pullFromSheet(false)" class="px-3 py-1.5 text-xs font-semibold border border-slate-300 rounded-lg hover:bg-slate-50">지금 불러오기 (시트 → 내 데이터)</button>
-        <button onclick="testSyncConnection()" class="px-3 py-1.5 text-xs font-semibold border border-slate-300 rounded-lg hover:bg-slate-50">연결 테스트</button>
-      </div>
-      <p class="text-[11px] text-slate-400 mt-2">참고: 두 사람이 같은 순간에 각자 수정하면 나중에 저장한 쪽이 반영됩니다(단순 최종수정 우선 방식). 중요한 편집 후에는 "지금 업로드"로 확인하는 걸 권장합니다.</p>
-    </section>
-  `;
-}
-
 function renderSettingsTab(){
   const s = state.settings;
+  const cohort = getCurrentCohort();
   return `
-    ${renderSyncSection()}
+    <section class="bg-white rounded-2xl border border-orange-200 shadow-sm p-5 mb-6">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-bold text-slate-800">기수(시즌) 관리</h2>
+        <button onclick="addCohort()" class="px-3 py-1.5 text-sm font-semibold bg-orange-500 text-white rounded-lg hover:bg-orange-600">+ 기수 추가</button>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        ${state.cohorts.map(co=>`
+          <div class="flex items-center gap-1.5 border rounded-lg px-2 py-1.5 ${co.id===state.currentCohortId ? "border-orange-400 bg-orange-50 ring-1 ring-orange-300" : "border-slate-200"}">
+            <input type="text" value="${esc(co.label)}" onchange="renameCohort('${co.id}',this.value)" class="border-0 focus:ring-0 text-sm font-semibold w-36 bg-transparent" />
+            ${co.id!==state.currentCohortId ? `<button onclick="setCohort('${co.id}')" class="text-[11px] text-orange-600 hover:underline whitespace-nowrap">선택</button>` : `<span class="text-[11px] text-orange-600 font-semibold whitespace-nowrap">현재 선택됨</span>`}
+            <button onclick="deleteCohort('${co.id}')" class="text-slate-400 hover:text-red-600 text-xs">✕</button>
+          </div>`).join("")}
+      </div>
+      <p class="text-xs text-slate-400 mt-2">현재 선택된 기수: <b class="text-orange-600">${escHtml(cohort.label)}</b> — 아래 "평가월 & 체크항목"과 활동사항 탭의 크리에이터 목록은 이 기수 기준입니다.</p>
+    </section>
+
     <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 mb-6">
-      <h2 class="font-bold text-slate-800 mb-3">연장 판정 기준</h2>
+      <h2 class="font-bold text-slate-800 mb-3">Status 기준</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <label class="block"><span class="text-xs text-slate-500">졸업(Graduation) 팔로워 기준</span>
           <input type="number" value="${s.graduationFollowers}" onchange="updateSettingNum('graduationFollowers',this.value)" class="w-full border border-slate-300 rounded-lg px-2 py-1.5 mt-0.5" /></label>
@@ -784,15 +838,16 @@ function renderSettingsTab(){
         <label class="block"><span class="text-xs text-slate-500">Review 최소 총점</span>
           <input type="number" value="${s.reviewMin}" onchange="updateSettingNum('reviewMin',this.value)" class="w-full border border-slate-300 rounded-lg px-2 py-1.5 mt-0.5" /></label>
       </div>
+      <p class="text-[11px] text-slate-400 mt-2">3기부터 팔로워 6만 이상은 명단 탭 "구분"에서 P(Private, 개별 심의필) 타입으로 표시해 정기 연장 로직과 별도로 관리할 수 있습니다.</p>
     </section>
 
     <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 mb-6">
       <div class="flex items-center justify-between mb-3">
-        <h2 class="font-bold text-slate-800">평가월 & 일정 체크항목</h2>
+        <h2 class="font-bold text-slate-800">평가월 & 일정 체크항목 <span class="text-xs font-normal text-slate-400">(${escHtml(cohort.label)})</span></h2>
         <button onclick="addEvalMonth()" class="px-3 py-1.5 text-sm font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-700">+ 평가월 추가</button>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-        ${s.evalMonths.map(m=>`
+        ${cohort.evalMonths.length ? cohort.evalMonths.map(m=>`
           <div class="border border-slate-200 rounded-lg p-3">
             <div class="flex items-center gap-1.5 mb-2">
               <input type="text" value="${esc(m.label)}" onchange="renameEvalMonth('${m.id}',this.value)" class="flex-1 border border-slate-200 rounded px-2 py-1 font-semibold text-sm" />
@@ -806,7 +861,7 @@ function renderSettingsTab(){
                 </div>`).join("")}
             </div>
             <button onclick="addEvalItem('${m.id}')" class="mt-2 text-xs font-semibold text-slate-600 hover:text-slate-900">+ 항목 추가</button>
-          </div>`).join("")}
+          </div>`).join("") : `<p class="text-xs text-slate-400 md:col-span-3">이 기수는 아직 평가월이 없습니다. "+ 평가월 추가"로 시작하세요 (예: 9월, 10월...).</p>`}
       </div>
     </section>
 
@@ -1054,7 +1109,7 @@ function importJsonFile(input){
   reader.onload = (e)=>{
     try{
       const parsed = JSON.parse(e.target.result);
-      if(!parsed.creators || !parsed.settings) throw new Error("invalid");
+      if(!parsed.cohorts || !parsed.settings) throw new Error("invalid");
       state = parsed; saveState(); render();
       alert("데이터를 불러왔습니다.");
     }catch(err){ alert("올바른 JSON 파일이 아닙니다."); }
@@ -1067,12 +1122,12 @@ function resetSample(){
 }
 
 /* ---------------- 메인 렌더 ---------------- */
-function setTab(tab){ currentTab = tab; render(); }
+function setTab(tab){ currentTab = tab; statsNonce++; render(); }
 
 function render(){
   const app = document.getElementById("app");
   const tabs = [
-    ["eval","활동평가"],
+    ["eval","활동사항"],
     ["roster","크리에이터 명단"],
     ["timeline","타임라인"],
     ["settings","설정"],
@@ -1084,33 +1139,41 @@ function render(){
   else if(currentTab==="settings") body = renderSettingsTab();
 
   app.innerHTML = `
-    <header class="mb-6">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900">🐯 호랑이클럽 운영진 대시보드</h1>
-          <p class="text-slate-500 text-sm mt-1">크리에이터 활동평가 · 명단 · 타임라인 통합 관리 (운영진 전용)</p>\n          <p class="text-[11px] text-amber-600 mt-1">⚠️ 공개 열람용 링크입니다. 명단의 개인정보(실명·연락처·주소·이메일)는 포함되어 있지 않습니다.</p>
+    <div class="flex flex-col md:flex-row min-h-screen">
+      <aside class="w-full md:w-56 md:shrink-0 bg-gradient-to-r md:bg-gradient-to-b from-orange-500 to-orange-600 text-white md:sticky md:top-0 md:h-screen md:overflow-y-auto">
+        <div class="flex flex-row md:flex-col items-center md:items-stretch gap-2 md:gap-1 p-3 md:p-4 overflow-x-auto md:overflow-visible">
+          <div class="shrink-0 md:mb-6 md:px-1 pr-2 md:pr-0 border-r md:border-r-0 border-white/20">
+            <div class="font-extrabold text-base md:text-lg leading-tight whitespace-nowrap">🐯 호랑이클럽</div>
+            <div class="hidden md:block text-orange-100 text-xs mt-0.5">운영진 대시보드</div>
+          </div>
+          <nav class="flex flex-row md:flex-col gap-1 shrink-0">
+            ${tabs.map(([id,label])=>`<button onclick="setTab('${id}')" class="text-left px-3 py-2 md:py-2.5 rounded-lg text-sm font-semibold transition whitespace-nowrap ${currentTab===id ? "bg-white text-orange-600 shadow-sm" : "text-white/90 hover:bg-white/10"}">${label}</button>`).join("")}
+          </nav>
+          <div class="shrink-0 ml-auto md:ml-0 md:mt-auto md:pt-4 md:border-t md:border-white/20">
+            <button onclick="resetSample()" class="text-[11px] md:text-xs text-orange-100 hover:text-white whitespace-nowrap">초기화</button>
+          </div>
         </div>
-        <div class="flex items-center gap-3 self-start md:self-auto">
-          ${syncConfig.url ? `<button onclick="setTab('settings')" class="flex items-center gap-1.5 text-xs text-slate-500 border border-slate-200 rounded-lg px-2.5 py-1.5 hover:bg-slate-50">${syncStatusDot()} ${syncConfig.autoSync?"자동동기화 중":"동기화 연결됨"}</button>` : ""}
-          <button onclick="resetSample()" class="text-xs text-slate-400 hover:text-red-500">샘플데이터로 초기화</button>
+      </aside>
+      <main class="flex-1 min-w-0 p-4 md:p-8 overflow-x-hidden">
+        <div class="max-w-[1400px] mx-auto">
+          <p class="text-[11px] text-amber-600 mb-3 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">⚠️ 공개 열람용 링크입니다. 명단의 개인정보(실명·연락처·주소·이메일)는 포함되어 있지 않습니다.</p>
+          ${body}
         </div>
-      </div>
-      <nav class="flex flex-wrap gap-1.5 bg-white border border-slate-200 rounded-xl p-1.5 shadow-sm mt-4 w-fit">
-        ${tabs.map(([id,label])=>`<button onclick="setTab('${id}')" class="tab-btn ${currentTab===id?"active":""}">${label}</button>`).join("")}
-      </nav>
-    </header>
-    <div>${body}</div>
+      </main>
+    </div>
     ${renderEventModal()}
   `;
   if(editingCell){
     const el = document.getElementById("active-cell-input");
     if(el){ el.focus(); if(el.select) el.select(); }
   }
+  if(currentTab==="eval" && statsNonce !== lastAnimatedStatsNonce){
+    lastAnimatedStatsNonce = statsNonce;
+    animateStatNumbers();
+  }
 }
 
 render();
-setupAutoSyncPolling();
-if(syncConfig.url){ pullFromSheet(true); }
 </script>
 </body>
 </html>
