@@ -1116,10 +1116,18 @@ function renderEvalTab(){
       </div>
     </section>
 
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 text-xs text-slate-500 leading-relaxed mb-3">
+      <p class="font-semibold text-slate-600 mb-1">타입 안내</p>
+      <p>· P형: 호랑이클럽 졸업생으로 개별 컨텐츠 협업</p>
+      <p>· A형: 하이라이트 이벤트 + 자율컨텐츠</p>
+      <p>· B형: 호랑이클럽 웹세미나 활동 참여 외 활동 N/A</p>
+    </section>
+
     <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 text-xs text-slate-500 leading-relaxed">
-      <p class="font-semibold text-slate-600 mb-1">채점 기준 (설정 탭에서 항목/기준 조정 가능)</p>
+      <p class="font-semibold text-slate-600 mb-1">활동기준 (설정 탭에서 항목/기준 조정 가능)</p>
       <p>· 일정 점수(자동 제안): 설정된 평가월 전체 체크 항목 중 미이행 0개 → 5점, 1~2개 → 3점, 3개 이상 → 1점. 상세보기에서 수동 조정 가능.</p>
-      <p>· 성과 점수: (반응지표 합계 ÷ 팔로워) 반응률을 전체 인원 기준 상대 순위로 상위 1/3 → 5점, 중위 1/3 → 3점, 하위 1/3 → 1점. 추가컨텐츠 등록 개수만큼 (+N) 가산되어 총점에 반영됩니다.</p>
+      <p>· 성과 점수: (반응지표 합계 ÷ 팔로워) 반응률을 전체 인원 기준 상대 순위로 상위 1/3 → 5점, 중위 1/3 → 3점, 하위 1/3 → 1점.</p>
+      <p>· 추가컨텐츠: 상세보기에서 등록한 추가컨텐츠 1건당 성과점수에 +1점씩 가산되어 총점에 반영됩니다. (표 상단 "추가컨텐츠" 토글로 노출 여부 조정 가능)</p>
       <p>· Status: 팔로워 ${fmtNum(s.graduationFollowers)}명 이상은 총점과 무관하게 Graduation. 그 외 총점 ${s.passMin}~10점 Pass · ${s.reviewMin}~${s.passMin-1}점 Review · ${s.reviewMin-1}점 이하 Adjust.</p>
     </section>
   `;
