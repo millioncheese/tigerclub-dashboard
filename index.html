@@ -38,9 +38,37 @@
 </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800">
-<div id="app" class="min-h-screen"></div>
+<div id="gate" class="min-h-screen flex items-center justify-center bg-gradient-to-b from-orange-500 to-orange-600 p-4">
+  <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm text-center">
+    <div class="text-3xl mb-2">🐯</div>
+    <div class="font-extrabold text-lg text-slate-800 mb-1">호랑이클럽 운영진 대시보드</div>
+    <div class="text-xs text-slate-400 mb-5">비밀번호를 입력해주세요</div>
+    <input id="gate-pw" type="password" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-center mb-2" placeholder="비밀번호" onkeydown="if(event.key==='Enter') checkGatePassword()" />
+    <div id="gate-error" class="text-xs text-red-500 mb-2 hidden">비밀번호가 올바르지 않습니다.</div>
+    <button onclick="checkGatePassword()" class="w-full bg-orange-500 text-white rounded-lg py-2 font-semibold hover:bg-orange-600">입장하기</button>
+  </div>
+</div>
+<div id="app" class="min-h-screen hidden"></div>
 
 <script>
+const GATE_PASSWORD = "etfistiger";
+const GATE_KEY = "tc_gate_unlocked";
+function checkGatePassword(){
+  const val = document.getElementById("gate-pw").value;
+  if(val === GATE_PASSWORD){
+    sessionStorage.setItem(GATE_KEY, "1");
+    unlockGate();
+  } else {
+    document.getElementById("gate-error").classList.remove("hidden");
+    document.getElementById("gate-pw").value = "";
+    document.getElementById("gate-pw").focus();
+  }
+}
+function unlockGate(){
+  document.getElementById("gate").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  render();
+}
 /* =========================================================
    호랑이클럽 운영진 대시보드 (v2 - 실데이터 반영)
    탭: 활동사항(자동채점) / 크리에이터 명단 / 타임라인 / 설정
@@ -1790,7 +1818,9 @@ function render(){
   }
 }
 
-render();
+if(sessionStorage.getItem(GATE_KEY) === "1"){
+  unlockGate();
+}
 </script>
 </body>
 </html>
