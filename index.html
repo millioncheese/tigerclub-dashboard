@@ -427,13 +427,17 @@ function computeEvalDerived(cohort){
 
   return withSchedule.map(c=>{
     const performanceScore = perfMap.get(c.id);
-    const totalScore = c.scheduleScore + performanceScore;
+    const extraContentCount = evalMonths.reduce((sum,m)=>{
+      const md = c.months[m.id];
+      return sum + ((md && md.extraContents) ? md.extraContents.length : 0);
+    }, 0);
+    const totalScore = c.scheduleScore + performanceScore + extraContentCount;
     let status, statusClass;
     if(c.followers >= s.graduationFollowers){ status="Graduation"; statusClass="chip-graduation"; }
     else if(totalScore >= s.passMin){ status="Pass"; statusClass="chip-pass"; }
     else if(totalScore >= s.reviewMin){ status="Review"; statusClass="chip-review"; }
     else { status="Adjust"; statusClass="chip-adjust"; }
-    return {...c, performanceScore, totalScore, status, statusClass};
+    return {...c, performanceScore, extraContentCount, totalScore, status, statusClass};
   });
 }
 
@@ -923,10 +927,15 @@ function renderGenericTable(tableKey, title){
 /* ---------------- 활동사항 탭 렌더 ---------------- */
 function monthDotsHtml(c, m){
   const md = c.months[m.id];
-  return (m.items||[]).map(it=>{
+  const checklistDots = (m.items||[]).map(it=>{
     const on = md && md.checklist && md.checklist[it.id];
     return `<span class="dot ${on?"dot-on":"dot-off"}" title="${escHtml(it.label)}: ${on?"완료":"미완료"}"></span>`;
   }).join(" ");
+  const extraCount = (md && md.extraContents) ? md.extraContents.length : 0;
+  const extraDots = extraCount>0
+    ? `<div class="flex items-center gap-0.5 mt-1">${Array.from({length:extraCount}).map(()=>`<span class="inline-block w-1.5 h-1.5 rounded-full bg-orange-400" title="추가컨텐츠"></span>`).join("")}</div>`
+    : "";
+  return `<div>${checklistDots}</div>${extraDots}`;
 }
 
 /* 필터 / 정렬 상태 */
@@ -1043,7 +1052,7 @@ function renderEvalTab(){
             <tr class="text-left text-slate-500 border-b border-slate-100">
               <th class="px-3 py-2 min-w-[100px] cursor-pointer select-none hover:text-slate-800" onclick="setEvalSort('name')">이름 ${sortArrow("name")}</th>
               <th class="px-3 py-2 min-w-[90px] cursor-pointer select-none hover:text-slate-800" onclick="setEvalSort('followers')">팔로워 ${sortArrow("followers")}</th>
-              ${cohort.evalMonths.map(m=>`<th class="px-3 py-2 min-w-[70px]">${escHtml(m.label)}</th>`).join("")}
+              ${cohort.evalMonths.map(m=>`<th class="px-3 py-2 min-w-[70px]"><div>${escHtml(m.label)}</div><div class="text-[9px] font-normal text-slate-400">추가컨텐츠</div></th>`).join("")}
               <th class="px-3 py-2 min-w-[90px] cursor-pointer select-none hover:text-slate-800" onclick="setEvalSort('rate')">반응률 ${sortArrow("rate")}</th>
               <th class="px-3 py-2 min-w-[70px] cursor-pointer select-none hover:text-slate-800" onclick="setEvalSort('performanceScore')">성과점수 ${sortArrow("performanceScore")}</th>
               <th class="px-3 py-2 min-w-[70px] cursor-pointer select-none hover:text-slate-800" onclick="setEvalSort('scheduleScore')">일정점수 ${sortArrow("scheduleScore")}</th>
@@ -1062,7 +1071,7 @@ function renderEvalTab(){
     <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 text-xs text-slate-500 leading-relaxed">
       <p class="font-semibold text-slate-600 mb-1">채점 기준 (설정 탭에서 항목/기준 조정 가능)</p>
       <p>· 일정 점수(자동 제안): 설정된 평가월 전체 체크 항목 중 미이행 0개 → 5점, 1~2개 → 3점, 3개 이상 → 1점. 상세보기에서 수동 조정 가능.</p>
-      <p>· 성과 점수: (반응지표 합계 ÷ 팔로워) 반응률을 전체 인원 기준 상대 순위로 상위 1/3 → 5점, 중위 1/3 → 3점, 하위 1/3 → 1점.</p>
+      <p>· 성과 점수: (반응지표 합계 ÷ 팔로워) 반응률을 전체 인원 기준 상대 순위로 상위 1/3 → 5점, 중위 1/3 → 3점, 하위 1/3 → 1점. 추가컨텐츠 등록 개수만큼 (+N) 가산되어 총점에 반영됩니다.</p>
       <p>· Status: 팔로워 ${fmtNum(s.graduationFollowers)}명 이상은 총점과 무관하게 Graduation. 그 외 총점 ${s.passMin}~10점 Pass · ${s.reviewMin}~${s.passMin-1}점 Review · ${s.reviewMin-1}점 이하 Adjust.</p>
     </section>
   `;
@@ -1191,7 +1200,7 @@ function evalRowHtml(c, isExpanded, cohort){
       <td class="px-3 py-2">${fmtNum(c.followers)}</td>
       ${cohort.evalMonths.map(m=>`<td class="px-3 py-2">${monthDotsHtml(c,m)}</td>`).join("")}
       <td class="px-3 py-2 tabular-nums">${fmtPct(c.rate)}</td>
-      <td class="px-3 py-2 font-semibold">${c.performanceScore}</td>
+      <td class="px-3 py-2 font-semibold">${c.performanceScore}${c.extraContentCount>0 ? ` <span class="text-emerald-600 text-[11px] font-bold">(+${c.extraContentCount})</span>` : ""}</td>
       <td class="px-3 py-2 font-semibold">${c.scheduleScore}${c.scheduleOverride!==null?'<span class="text-[10px] text-slate-400 ml-1">(수동)</span>':""}</td>
       <td class="px-3 py-2 font-extrabold text-slate-900">${c.totalScore}</td>
       <td class="px-3 py-2"><span class="chip ${c.statusClass}">${c.status}</span></td>
