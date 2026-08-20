@@ -31,8 +31,9 @@
   input, textarea, select { font-size: 13px; }
   ::-webkit-scrollbar { height: 8px; width: 8px; }
   ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius: 4px; }
-  .cal-cell { min-height: 96px; padding: 6px; cursor: pointer; overflow: hidden; }
-  .cal-cell:hover { background: #f8fafc; }
+  .cal-daynum { min-height: 96px; padding: 6px 8px; cursor: pointer; }
+  .cal-daynum:hover { background: #f8fafc; }
+  .event-bar { height: 18px; line-height: 18px; font-size: 10px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
   .cell-view { padding: 7px 9px; border-radius: 6px; cursor: text; min-height: 30px; display: flex; align-items: center; color: #334155; }
   .cell-view:hover { background: #f1f5f9; }
 </style>
@@ -384,14 +385,32 @@ function migrateBackfillEvalMonths(parsed){
   });
   return parsed;
 }
+function normalizeTimeline(parsed){
+  // 타임라인 일정에 기간(시작일~종료일)·종류·회의록 구조가 없으면 채워줌 (구버전 date 단일필드 -> startDate/endDate 이전 포함)
+  if(!parsed || !parsed.timeline) return parsed;
+  if(parsed.settings && (!parsed.settings.eventTypes || !parsed.settings.eventTypes.length)){
+    parsed.settings.eventTypes = ["웹세미나", "일반", "미팅"];
+  }
+  (parsed.timeline.rows||[]).forEach(r=>{
+    if(r.startDate === undefined){
+      r.startDate = r.date || todayStr();
+      r.endDate = r.date || r.startDate;
+    }
+    if(!r.endDate) r.endDate = r.startDate;
+    if(r.endDate < r.startDate) r.endDate = r.startDate;
+    if(!r.eventType) r.eventType = "일반";
+    if(!r.meetingNotes) r.meetingNotes = {agenda:"", decisions:"", actionItems:"", nextMeeting:""};
+  });
+  return parsed;
+}
 function loadState(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw) return migrateBackfillEvalMonths(migrateRosterPerCohort(migrateSeedGen3(migrateSplitGen12(migrateToCohorts(JSON.parse(raw))))));
+    if(raw) return normalizeTimeline(migrateBackfillEvalMonths(migrateRosterPerCohort(migrateSeedGen3(migrateSplitGen12(migrateToCohorts(JSON.parse(raw)))))));
   }catch(e){}
   const s = JSON.parse(JSON.stringify(SEED));
   s.updatedAt = Date.now();
-  return s;
+  return normalizeTimeline(s);
 }
 function getCurrentCohort(){
   return state.cohorts.find(c=>c.id===state.currentCohortId) || state.cohorts[0];
@@ -698,7 +717,13 @@ function deleteColumn(tableKey, colId){
 function addRow(tableKey){
   const cells = {};
   getTable(tableKey).columns.forEach(c=> cells[c.id] = c.type==="checkbox" ? false : "");
-  getTable(tableKey).rows.push({id: rid("row"), cells});
+  const row = {id: rid("row"), cells};
+  if(tableKey==="timeline"){
+    row.startDate = todayStr(); row.endDate = todayStr();
+    row.eventType = "일반";
+    row.meetingNotes = {agenda:"", decisions:"", actionItems:"", nextMeeting:""};
+  }
+  getTable(tableKey).rows.push(row);
   if(tableKey==="roster") syncCreatorsFromRoster(getCurrentCohort());
   saveState(); render();
 }
@@ -1563,18 +1588,57 @@ function shiftCalMonth(delta){
 function calToday(){
   const d=new Date(); calState = {year:d.getFullYear(), month:d.getMonth()+1}; render();
 }
-function buildMonthGrid(year, month){
+function buildMonthWeeks(year, month){
   const first = new Date(year, month-1, 1);
   const startWeekday = (first.getDay()+6)%7; // 월=0 ... 일=6
   const gridStart = new Date(year, month-1, 1-startWeekday);
-  const cells = [];
-  for(let i=0;i<42;i++){
-    const d = new Date(gridStart); d.setDate(gridStart.getDate()+i);
-    const mm = String(d.getMonth()+1).padStart(2,"0");
-    const dd = String(d.getDate()).padStart(2,"0");
-    cells.push({day:d.getDate(), current: d.getMonth()===month-1, dateStr:`${d.getFullYear()}-${mm}-${dd}`});
+  const weeks = [];
+  for(let w=0; w<6; w++){
+    const week = [];
+    for(let i=0;i<7;i++){
+      const d = new Date(gridStart); d.setDate(gridStart.getDate()+w*7+i);
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const dd = String(d.getDate()).padStart(2,"0");
+      week.push({day:d.getDate(), current: d.getMonth()===month-1, dateStr:`${d.getFullYear()}-${mm}-${dd}`});
+    }
+    weeks.push(week);
   }
-  return cells;
+  return weeks;
+}
+function layoutWeekBars(week){
+  // 한 주(7일) 안에서 여러 날에 걸친 일정을 겹치지 않는 "레인(lane)"에 배치
+  const weekStart = week[0].dateStr, weekEnd = week[6].dateStr;
+  const segs = state.timeline.rows
+    .filter(r=> r.startDate && r.endDate && r.startDate<=weekEnd && r.endDate>=weekStart)
+    .map(r=>{
+      let startIdx = week.findIndex(c=>c.dateStr===r.startDate);
+      let endIdx = week.findIndex(c=>c.dateStr===r.endDate);
+      if(startIdx===-1) startIdx = r.startDate < weekStart ? 0 : 6;
+      if(endIdx===-1) endIdx = r.endDate > weekEnd ? 6 : 0;
+      return {
+        row: r,
+        startCol: startIdx+1,
+        endCol: endIdx+1,
+        isStart: r.startDate>=weekStart && r.startDate<=weekEnd,
+        isEnd: r.endDate>=weekStart && r.endDate<=weekEnd,
+      };
+    })
+    .sort((a,b)=> a.startCol-b.startCol || (a.endCol-a.startCol)-(b.endCol-b.startCol));
+  const lanes = [];
+  const laneEndCols = [];
+  segs.forEach(seg=>{
+    let laneIdx = laneEndCols.findIndex(end=> end < seg.startCol);
+    if(laneIdx===-1){ laneIdx = lanes.length; lanes.push([]); laneEndCols.push(-1); }
+    lanes[laneIdx].push(seg);
+    laneEndCols[laneIdx] = seg.endCol;
+  });
+  return lanes;
+}
+function eventBarHtml(seg){
+  const cls = pillClass(seg.row.cells.status);
+  const rounded = `${seg.isStart?"rounded-l":""} ${seg.isEnd?"rounded-r":""}`.trim();
+  const label = seg.row.cells.content || seg.row.cells.todo || "(제목없음)";
+  return `<div onclick="event.stopPropagation(); openEventModal(null,'${seg.row.id}')" style="grid-column:${seg.startCol} / ${seg.endCol+1};" class="event-bar ${cls} ${rounded} px-1.5 truncate cursor-pointer" title="${escHtml(label)} (${escHtml(seg.row.startDate)}~${escHtml(seg.row.endDate)})">${escHtml(label)}</div>`;
 }
 function pillClass(status){
   if(status==="완료") return "bg-green-100 text-green-700";
@@ -1583,32 +1647,72 @@ function pillClass(status){
   if(status==="사후관리") return "bg-purple-100 text-purple-700";
   return "bg-amber-100 text-amber-700";
 }
-function updateRowDate(rowId, value){
+function getEventTypes(){
+  if(!state.settings.eventTypes || !state.settings.eventTypes.length){
+    state.settings.eventTypes = ["웹세미나", "일반", "미팅"];
+  }
+  return state.settings.eventTypes;
+}
+function updateRowStartDate(rowId, value){
   const row = state.timeline.rows.find(r=>r.id===rowId); if(!row) return;
-  row.date = value; saveState(); render();
+  row.startDate = value;
+  if(!row.endDate || row.endDate < value) row.endDate = value;
+  saveState(); render();
+}
+function updateRowEndDate(rowId, value){
+  const row = state.timeline.rows.find(r=>r.id===rowId); if(!row) return;
+  if(value && row.startDate && value < row.startDate){ alert("종료일은 시작일보다 빠를 수 없습니다."); return; }
+  row.endDate = value || row.startDate; saveState(); render();
 }
 
 function openEventModal(dateStr, rowId){
-  if(rowId){ modalState = {dateStr, rowId, isNew:false}; render(); return; }
+  if(rowId){ modalState = {rowId, isNew:false}; render(); return; }
   const cells = {};
   state.timeline.columns.forEach(c=> cells[c.id] = c.type==="checkbox" ? false : "");
-  const row = {id: rid("t"), date: dateStr, cells};
+  const row = {id: rid("t"), startDate: dateStr, endDate: dateStr, eventType: "일반", cells, meetingNotes:{agenda:"", decisions:"", actionItems:"", nextMeeting:""}};
   state.timeline.rows.push(row);
   saveState();
-  modalState = {dateStr, rowId: row.id, isNew:true};
+  modalState = {rowId: row.id, isNew:true};
   render();
 }
 function closeEventModal(){
   if(modalState && modalState.isNew){
     const row = state.timeline.rows.find(r=>r.id===modalState.rowId);
-    const blank = row && Object.values(row.cells).every(v=> v==="" || v===false || v===undefined || v===null);
-    if(blank){ state.timeline.rows = state.timeline.rows.filter(r=>r.id!==modalState.rowId); saveState(); }
+    const cellsBlank = row && Object.values(row.cells).every(v=> v==="" || v===false || v===undefined || v===null);
+    const notesBlank = row && row.meetingNotes && Object.values(row.meetingNotes).every(v=> !v);
+    if(cellsBlank && notesBlank){ state.timeline.rows = state.timeline.rows.filter(r=>r.id!==modalState.rowId); saveState(); }
   }
   modalState = null; render();
 }
-function modalUpdateDate(value){
+function modalUpdateStartDate(value){
   const row = state.timeline.rows.find(r=>r.id===modalState.rowId); if(!row) return;
-  row.date = value; modalState.dateStr = value; saveState(); render();
+  row.startDate = value;
+  if(!row.endDate || row.endDate < value) row.endDate = value;
+  saveState(); render();
+}
+function modalUpdateEndDate(value){
+  const row = state.timeline.rows.find(r=>r.id===modalState.rowId); if(!row) return;
+  if(value && row.startDate && value < row.startDate){ alert("종료일은 시작일보다 빠를 수 없습니다."); return; }
+  row.endDate = value || row.startDate; saveState(); render();
+}
+function modalUpdateEventType(value){
+  const row = state.timeline.rows.find(r=>r.id===modalState.rowId); if(!row) return;
+  if(value === "__add__"){
+    const name = prompt("새 일정 종류 이름을 입력하세요");
+    if(!name || !name.trim()) return;
+    const trimmed = name.trim();
+    const types = getEventTypes();
+    if(!types.includes(trimmed)) types.push(trimmed);
+    row.eventType = trimmed;
+  } else {
+    row.eventType = value;
+  }
+  saveState(); render();
+}
+function modalUpdateMeetingNote(field, value){
+  const row = state.timeline.rows.find(r=>r.id===modalState.rowId); if(!row) return;
+  if(!row.meetingNotes) row.meetingNotes = {agenda:"", decisions:"", actionItems:"", nextMeeting:""};
+  row.meetingNotes[field] = value; saveState(); render();
 }
 function modalUpdateCell(colId, value){
   const row = state.timeline.rows.find(r=>r.id===modalState.rowId); if(!row) return;
@@ -1631,27 +1735,77 @@ function modalFieldInput(row, col){
   const type = col.type==="number" ? "number" : (col.type==="date" ? "date" : "text");
   return `<input type="${type}" value="${esc(val)}" onchange="${onCh}" class="w-full border border-slate-300 rounded-lg px-2 py-1.5 mt-0.5" />`;
 }
+function meetingNoteField(row, field, label, opts){
+  opts = opts || {};
+  const val = (row.meetingNotes && row.meetingNotes[field]) || "";
+  if(opts.type==="date"){
+    return `<label class="block mb-2">
+      <span class="text-xs text-slate-500">${escHtml(label)}</span>
+      <input type="date" value="${esc(val)}" onchange="modalUpdateMeetingNote('${field}', this.value)" class="w-full border border-slate-300 rounded-lg px-2 py-1.5 mt-0.5" />
+    </label>`;
+  }
+  return `<label class="block mb-2">
+    <span class="text-xs text-slate-500">${escHtml(label)}</span>
+    <textarea onchange="modalUpdateMeetingNote('${field}', this.value)" placeholder="${escHtml(opts.placeholder||"")}" class="w-full border border-slate-300 rounded-lg px-2 py-1.5 mt-0.5" rows="${opts.rows||2}">${escHtml(val)}</textarea>
+  </label>`;
+}
+function eventTypeSelectHtml(row){
+  const types = getEventTypes();
+  const current = row.eventType || "일반";
+  const opts = types.map(t=>`<option value="${esc(t)}" ${current===t?"selected":""}>${escHtml(t)}</option>`).join("");
+  return `<label class="block mb-2">
+    <span class="text-xs text-slate-500">종류</span>
+    <select onchange="modalUpdateEventType(this.value)" class="w-full border border-slate-300 rounded-lg px-2 py-1.5 mt-0.5">
+      ${opts}
+      <option value="__add__">+ 새 종류 추가...</option>
+    </select>
+  </label>`;
+}
 function renderEventModal(){
   if(!modalState) return "";
   const row = state.timeline.rows.find(r=>r.id===modalState.rowId);
   if(!row) return "";
+  const meetingNotesHtml = row.eventType==="미팅" ? `
+      <div class="mt-1 mb-2 pt-3 border-t border-slate-200">
+        <p class="text-xs font-semibold text-slate-600 mb-2">📝 회의록</p>
+        ${meetingNoteField(row, "agenda", "주요 안건", {rows:2, placeholder:"논의한 주제를 적어주세요"})}
+        ${meetingNoteField(row, "decisions", "결정 사항", {rows:2, placeholder:"합의/결정된 내용을 적어주세요"})}
+        ${meetingNoteField(row, "actionItems", "액션 아이템", {rows:2, placeholder:"할 일을 한 줄에 하나씩 적어주세요"})}
+        ${meetingNoteField(row, "nextMeeting", "다음 미팅 일정", {type:"date"})}
+      </div>` : "";
+  let meetingNotesInjected = false;
+  const columnFieldsHtml = state.timeline.columns.map(c=>{
+    const field = `
+        <label class="block mb-2">
+          <span class="text-xs text-slate-500">${escHtml(c.label)}</span>
+          ${modalFieldInput(row, c)}
+        </label>`;
+    if(c.id==="memo" && meetingNotesHtml){
+      meetingNotesInjected = true;
+      return field + meetingNotesHtml;
+    }
+    return field;
+  }).join("");
   return `
   <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onclick="closeEventModal()">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-5 max-h-[85vh] overflow-y-auto" onclick="event.stopPropagation()">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-5 max-h-[85vh] overflow-y-auto" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between mb-3">
         <h3 class="font-bold text-slate-800">일정 상세</h3>
         <button onclick="closeEventModal()" class="text-slate-400 hover:text-slate-700">✕</button>
       </div>
-      <label class="block mb-2">
-        <span class="text-xs text-slate-500">날짜</span>
-        <input type="date" value="${row.date}" onchange="modalUpdateDate(this.value)" class="w-full border border-slate-300 rounded-lg px-2 py-1.5 mt-0.5" />
-      </label>
-      ${state.timeline.columns.map(c=>`
-        <label class="block mb-2">
-          <span class="text-xs text-slate-500">${escHtml(c.label)}</span>
-          ${modalFieldInput(row, c)}
+      <div class="grid grid-cols-2 gap-2 mb-2">
+        <label class="block">
+          <span class="text-xs text-slate-500">시작일</span>
+          <input type="date" value="${row.startDate||""}" onchange="modalUpdateStartDate(this.value)" class="w-full border border-slate-300 rounded-lg px-2 py-1.5 mt-0.5" />
         </label>
-      `).join("")}
+        <label class="block">
+          <span class="text-xs text-slate-500">종료일</span>
+          <input type="date" value="${row.endDate||""}" min="${row.startDate||""}" onchange="modalUpdateEndDate(this.value)" class="w-full border border-slate-300 rounded-lg px-2 py-1.5 mt-0.5" />
+        </label>
+      </div>
+      ${eventTypeSelectHtml(row)}
+      ${columnFieldsHtml}
+      ${!meetingNotesInjected ? meetingNotesHtml : ""}
       <div class="flex justify-between items-center mt-4">
         <button onclick="modalDeleteRow()" class="text-xs font-semibold text-red-500 hover:text-red-700">일정 삭제</button>
         <button onclick="closeEventModal()" class="px-4 py-1.5 text-sm font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-700">완료</button>
@@ -1682,7 +1836,7 @@ function renderTimelineTab(){
 }
 
 function renderTimelineCalendar(){
-  const cells = buildMonthGrid(calState.year, calState.month);
+  const weeks = buildMonthWeeks(calState.year, calState.month);
   const todayIso = todayStr();
   const weekdayLabels = ["월","화","수","목","금","토","일"];
   return `
@@ -1695,17 +1849,23 @@ function renderTimelineCalendar(){
         </div>
         <button onclick="calToday()" class="px-3 py-1.5 text-xs font-semibold border border-slate-300 rounded-lg hover:bg-slate-50">오늘</button>
       </div>
-      <div class="grid grid-cols-7 border-t border-l border-slate-200">
-        ${weekdayLabels.map(w=>`<div class="text-center text-xs font-semibold text-slate-500 py-2 border-b border-r border-slate-200 bg-slate-50">${w}</div>`).join("")}
-        ${cells.map(cell=>{
-          const rows = state.timeline.rows.filter(r=>r.date===cell.dateStr);
-          const isToday = cell.dateStr===todayIso;
+      <div class="border-t border-l border-slate-200">
+        <div class="grid grid-cols-7">
+          ${weekdayLabels.map(w=>`<div class="text-center text-xs font-semibold text-slate-500 py-2 border-b border-r border-slate-200 bg-slate-50">${w}</div>`).join("")}
+        </div>
+        ${weeks.map(week=>{
+          const lanes = layoutWeekBars(week);
           return `
-          <div class="cal-cell border-b border-r border-slate-200 ${cell.current?"bg-white":"bg-slate-50/60"}" onclick="openEventModal('${cell.dateStr}', null)">
-            <div class="text-xs font-semibold mb-1 ${cell.current?"text-slate-700":"text-slate-300"}"><span class="${isToday?"inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-500 text-white":""}">${cell.day}</span></div>
-            <div class="space-y-1">
-              ${rows.map(r=>`<div onclick="event.stopPropagation(); openEventModal('${cell.dateStr}','${r.id}')" class="text-[11px] px-1.5 py-0.5 rounded ${pillClass(r.cells.status)} truncate cursor-pointer" title="${escHtml(r.cells.content||r.cells.todo||"")}">${escHtml(r.cells.content || r.cells.todo || "(제목없음)")}</div>`).join("")}
+          <div class="border-b border-slate-200">
+            <div class="grid grid-cols-7">
+              ${week.map(cell=>{
+                const isToday = cell.dateStr===todayIso;
+                return `<div class="cal-daynum border-r border-slate-200 ${cell.current?"bg-white":"bg-slate-50/60"}" onclick="openEventModal('${cell.dateStr}', null)">
+                  <span class="text-xs font-semibold ${cell.current?"text-slate-700":"text-slate-300"}"><span class="${isToday?"inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-500 text-white":""}">${cell.day}</span></span>
+                </div>`;
+              }).join("")}
             </div>
+            ${lanes.map(lane=>`<div class="grid grid-cols-7 gap-px px-px pb-0.5">${lane.map(seg=>eventBarHtml(seg)).join("")}</div>`).join("")}
           </div>`;
         }).join("")}
       </div>
@@ -1715,13 +1875,14 @@ function renderTimelineCalendar(){
 
 function renderTimelineTable(){
   const t = state.timeline;
-  const rows = [...t.rows].sort((a,b)=> (a.date||"").localeCompare(b.date||""));
+  const rows = [...t.rows].sort((a,b)=> (a.startDate||"").localeCompare(b.startDate||""));
   return `
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <thead>
           <tr class="text-left text-slate-500 border-b border-slate-100">
-            <th class="px-2 py-2">날짜</th>
+            <th class="px-2 py-2">시작일</th>
+            <th class="px-2 py-2">종료일</th>
             ${t.columns.map(c=>`
               <th class="px-2 py-2 whitespace-nowrap">
                 <div class="flex items-center gap-1">
@@ -1736,9 +1897,13 @@ function renderTimelineTable(){
         <tbody>
           ${rows.map(r=>`
             <tr class="border-b border-slate-50 hover:bg-slate-50/40 align-middle group">
-              <td class="px-1 py-0.5"><input type="date" value="${r.date||""}" onchange="updateRowDate('${r.id}', this.value)" class="border border-slate-200 rounded px-1.5 py-1" /></td>
+              <td class="px-1 py-0.5"><input type="date" value="${r.startDate||""}" onchange="updateRowStartDate('${r.id}', this.value)" class="border border-slate-200 rounded px-1.5 py-1" /></td>
+              <td class="px-1 py-0.5"><input type="date" value="${r.endDate||""}" min="${r.startDate||""}" onchange="updateRowEndDate('${r.id}', this.value)" class="border border-slate-200 rounded px-1.5 py-1" /></td>
               ${t.columns.map(c=>`<td class="px-1 py-0.5">${cellHtml("timeline", r, c)}</td>`).join("")}
-              <td class="px-2 py-1.5 opacity-0 group-hover:opacity-100 transition"><button onclick="deleteRow('timeline','${r.id}')" class="text-slate-400 hover:text-red-600 text-xs">삭제</button></td>
+              <td class="px-2 py-1.5 whitespace-nowrap">
+                <button onclick="openEventModal(null,'${r.id}')" class="text-slate-400 hover:text-slate-700 text-xs mr-2" title="회의록/상세 보기">📝 상세</button>
+                <button onclick="deleteRow('timeline','${r.id}')" class="text-slate-400 hover:text-red-600 text-xs opacity-0 group-hover:opacity-100 transition">삭제</button>
+              </td>
             </tr>`).join("")}
         </tbody>
       </table>
